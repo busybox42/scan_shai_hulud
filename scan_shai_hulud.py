@@ -1,5 +1,6 @@
     #!/usr/bin/env python3
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -14,9 +15,9 @@ IOC_FILENAMES = {
     "contents.json",
     "environment.json",
     "truffleSecrets.json",
-    "actionsSecrets.json",
-    "setup_bun.js",
-    "bun_environment.js",
+    "actionsSecrets.json",  # Double Base64 encoded credentials (Nov 2025)
+    "setup_bun.js",  # Fake Bun installer (Second Coming attack)
+    "bun_environment.js",  # Obfuscated payload (Second Coming attack)
     "bundle.js",  # Common obfuscated payload filename
     # Additional exfiltration artifacts
     "secrets.json",
@@ -28,6 +29,18 @@ IOC_FILENAMES = {
     # TruffleHog-related artifacts
     "trufflehog_results.json",
     "trufflehog_output.json",
+}
+
+# Known malicious SHA256 hashes of bundle.js variants (V1-V7)
+# Source: Socket.dev, JFrog security reports
+MALICIOUS_HASHES = {
+    "de0e25a3e6c1e1e5998b306b7141b3dc4c0088da9d7bb47c1c00c91e6e4f85d6",
+    "81d2a004a1bca6ef87a1caf7d0e0b355ad1764238e40ff6d1b1cb77ad4f595c3",
+    "83a650ce44b2a9854802a7fb4c202877815274c129af49e6c2d1d5d5d55c501e",
+    "4b2399646573bb737c4969563303d8ee2e9ddbd1b271f1ca9e35ea78062538db",
+    "dc67467a39b70d1cd4c1f7f7a459b35058163592f4a9e8fb4dffcbba98ef210c",
+    "46faab8ab153fae6e80e7cca38eab363075bb524edd79e42269217a083628f09",
+    "b74caeaa75e077c99f7d44f46daaf9796a3be43ecf24f2a1fd381844669da777",
 }
 
 IOC_WORKFLOW_PATHS = {
@@ -72,6 +85,44 @@ IOC_DOMAINS = {
     "npmpackage.com",
     "pkgstats.com",
     "telemetry-npm.com",
+    "npmjs.help",  # Phishing domain from chalk/debug attack
+}
+
+# Exfiltration endpoints used by Shai-Hulud and similar attacks
+# webhook.site is the PRIMARY exfil endpoint for Shai-Hulud
+IOC_EXFIL_ENDPOINTS = {
+    "webhook.site",  # PRIMARY - Shai-Hulud exfil endpoint
+    "discord.com/api/webhooks",
+    "api.telegram.org",
+    "hooks.slack.com",
+    "requestbin.com",
+    "beeceptor.com",
+    "pipedream.com",
+    "zapier.com/hooks",
+    "ngrok.io",
+    "localtunnel.me",
+    "serveo.net",
+    "pastebin.com",
+    "hastebin.com",
+    "ix.io",
+    "0x0.st",
+    "transfer.sh",
+    "file.io",
+}
+
+# Known attacker cryptocurrency wallet addresses
+ATTACKER_WALLETS = {
+    "0xFc4a4858bafef54D1b1d7697bfb5c52F4c166976",  # Ethereum
+    "1H13VnQJKtT4HjD5ZFKaaiZEetMbG7nDHx",  # Bitcoin
+    "TB9emsCq6fQw6wRk4HBxxNnU6Hwt1DnV67",  # Tron
+}
+
+# Crypto theft function names from chalk/debug attack (Sept 8, 2025)
+CRYPTO_THEFT_FUNCTIONS = {
+    "checkethereumw",
+    "runmask",
+    "newdlocal",
+    "_0x19ca67",  # Obfuscated function name
 }
 
 # Suspicious code patterns in postinstall/preinstall scripts
@@ -86,42 +137,35 @@ SUSPICIOUS_SCRIPT_PATTERNS = [
     r"https?://[^\s]*\?.*(?:env|token|secret)",  # URL with sensitive params
     r'Buffer\.from\s*\([^)]+,\s*[\'"]base64[\'"]\)',  # base64 decoding
     r"\batob\s*\(",  # base64 decode in browser context
+    r"node\s+setup_bun\.js",  # Fake Bun installer (Second Coming attack)
 ]
+
+# Destructive payload patterns (fallback when credential theft fails)
+DESTRUCTIVE_PATTERNS = [
+    r"rm\s+-rf\s+[\$~]HOME",  # rm -rf $HOME or ~HOME
+    r"rm\s+-rf\s+~/",  # rm -rf ~/
+    r"rm\s+-rf\s+/home/",  # rm -rf /home/
+    r'fs\.rmSync\s*\([^)]*recursive\s*:\s*true',  # Node.js recursive delete
+    r'fs\.rm\s*\([^)]*recursive\s*:\s*true',  # Node.js async recursive delete
+    r"rimraf\s+[\$~]HOME",  # rimraf $HOME
+    r"Remove-Item\s+-Recurse.*\$HOME",  # PowerShell recursive delete
+    r"del\s+/s\s+/q.*%USERPROFILE%",  # Windows cmd delete
+]
+
+# Self-hosted runner backdoor patterns (Nov 2025 attack)
+RUNNER_BACKDOOR_PATTERNS = {
+    ".dev-env/",  # Hidden directory for persistent backdoor
+    "SHA1HULUD",  # Runner naming pattern
+    "Sha1Hulud",
+    "sha1hulud",
+}
 
 # Compromised packages with known vulnerable version ranges
 # Format: "package-name": [("min_version", "max_version"), ...] or None for all versions
 # Use None as min to mean 0.0.0, None as max to mean infinity
+# NOTE: This is a fallback list. The main list is loaded from compromised-packages.txt
 COMPROMISED_PACKAGES = {
-    # Shai-Hulud campaign - assume all versions compromised until verified
-    "@postman/tunnel-agent": None,  # All versions suspect
-    "posthog-node": None,
-    "posthog-js": None,
-    "@asyncapi/specs": None,
-    "@asyncapi/openapi-schema-parser": None,
-    "@asyncapi/cli": None,
-    "@zapier/zapier-sdk": None,
-    "@zapier/mcp-integration": None,
-    "@zapier/secret-scrubber": None,
-    "@ensdomains/ens-validation": None,
-    "@ensdomains/content-hash": None,
-    "ethereum-ens": None,
-    "@posthog/agent": None,
-    "@lottiefiles/lottie-player": [("2.0.4", "2.0.8")],  # Compromised versions
-    "@lottiefiles/lottie-web": None,
-    "@rspack/core": [("1.1.7", "1.1.7")],  # Specific compromised version
-    "@rspack/cli": [("1.1.7", "1.1.7")],
-    "vant": [("4.9.7", "4.9.14")],  # Compromised range
-    "@solana/web3.js": [("1.95.5", "1.95.7")],  # Compromised versions Dec 2024
-    # @ctrl namespace packages (targeted by Shai-Hulud)
-    "@ctrl/tinycolor": None,
-    "@ctrl/ngx-codemirror": None,
-    "@ctrl/ngx-rightclick": None,
-    # @crowdstrike namespace (targeted)
-    "@crowdstrike/falcon-utilities": None,
-    # @art-ws namespace (targeted)
-    "@art-ws/core": None,
-    "@art-ws/react": None,
-    # Historical compromises with known bad versions
+    # Historical compromises with known bad versions (fallback)
     "coa": [("2.0.3", "2.0.4"), ("2.1.1", "2.1.3"), ("3.0.1", "3.1.3")],
     "rc": [("1.2.9", "1.2.9"), ("1.3.9", "1.3.9"), ("2.3.9", "2.3.9")],
     "ua-parser-js": [("0.7.29", "0.7.29"), ("0.8.0", "0.8.0"), ("1.0.0", "1.0.0")],
@@ -132,6 +176,10 @@ COMPROMISED_PACKAGES = {
     "node-ipc": [("10.1.1", "10.1.3"), ("11.0.0", "11.1.0")],  # Peacenotwar malware
     "peacenotwar": None,  # Entirely malicious
 }
+
+# Exact compromised package:version pairs loaded from external file
+# This is populated by load_compromised_packages_file()
+COMPROMISED_PACKAGES_EXACT: set = set()
 
 # Suspicious npm namespaces known to be targeted by supply chain attacks
 SUSPICIOUS_NAMESPACES = {
@@ -146,6 +194,21 @@ SUSPICIOUS_NAMESPACES = {
     "@lottiefiles",
     "@rspack",
     "@solana",
+    # Additional targeted namespaces from Cobenian analysis
+    "@nativescript-community",
+    "@ahmedhfarag",
+    "@operato",
+    "@teselagen",
+    "@things-factory",
+    "@hestjs",
+    "@nstudio",
+    "@voiceflow",
+    "@oku-ui",
+    "@browserbasehq",
+    "@ntnx",
+    "@pergel",
+    "@silgi",
+    "@mcp-use",
 }
 
 LOCKFILE_NAMES = {
@@ -154,6 +217,35 @@ LOCKFILE_NAMES = {
     "pnpm-lock.yml",
     "yarn.lock",
 }
+
+
+def load_compromised_packages_file():
+    """Load compromised packages from external file (package:version format)."""
+    global COMPROMISED_PACKAGES_EXACT
+    
+    # Try to find compromised-packages.txt in script directory
+    script_dir = Path(__file__).parent
+    pkg_file = script_dir / "compromised-packages.txt"
+    
+    if not pkg_file.exists():
+        return 0
+    
+    count = 0
+    try:
+        with pkg_file.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                # Skip comments and empty lines
+                if not line or line.startswith("#"):
+                    continue
+                # Format: package_name:version
+                if ":" in line:
+                    COMPROMISED_PACKAGES_EXACT.add(line)
+                    count += 1
+    except OSError:
+        pass
+    
+    return count
 
 # Global progress bar instance
 _progress_bar = None
@@ -478,7 +570,7 @@ def parse_pnpm_lock(path: Path):
 
 
 def scan_lockfiles_for_packages(root: Path):
-    """Scan lockfiles for compromised packages, checking version ranges."""
+    """Scan lockfiles for compromised packages, checking version ranges and exact matches."""
     matches = {}
     dir_count = 0
     for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
@@ -502,9 +594,16 @@ def scan_lockfiles_for_packages(root: Path):
             elif name == "yarn.lock":
                 pkgs = parse_yarn_lock(path)
             
-            # Check each package against compromised list with version ranges
+            # Check each package against compromised list
             bad = []
             for pkg_name, pkg_version in pkgs.items():
+                # First check exact package:version from external file (1700+ packages)
+                pkg_key = f"{pkg_name}:{pkg_version}"
+                if pkg_key in COMPROMISED_PACKAGES_EXACT:
+                    bad.append((pkg_name, pkg_version, "exact match"))
+                    continue
+                
+                # Then check version ranges from built-in list
                 if pkg_name in COMPROMISED_PACKAGES:
                     vuln_ranges = COMPROMISED_PACKAGES[pkg_name]
                     if is_version_in_range(pkg_version, vuln_ranges):
@@ -1072,6 +1171,245 @@ def scan_git_hooks(root: Path):
     return hits
 
 
+def compute_file_hash(path: Path) -> str:
+    """Compute SHA256 hash of a file."""
+    sha256 = hashlib.sha256()
+    try:
+        with path.open("rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                sha256.update(chunk)
+        return sha256.hexdigest()
+    except OSError:
+        return ""
+
+
+def scan_for_malicious_hashes(root: Path):
+    """Scan JavaScript files for known malicious SHA256 hashes."""
+    hits = []
+    dir_count = 0
+
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dir_count += 1
+        progress(dir_count)
+
+        base = os.path.basename(dirpath)
+        if base in {".git", ".cache", "node_modules", ".npm", ".pnpm-store"}:
+            dirnames[:] = []
+            continue
+
+        for name in filenames:
+            if not name.endswith((".js", ".mjs", ".cjs")):
+                continue
+            path = Path(dirpath) / name
+            try:
+                size = path.stat().st_size
+            except (FileNotFoundError, OSError):
+                continue
+            # Skip very large files (unlikely to be malicious payload)
+            if size > 1024 * 1024:
+                continue
+            
+            file_hash = compute_file_hash(path)
+            if file_hash in MALICIOUS_HASHES:
+                hits.append((str(path), file_hash))
+
+    return hits
+
+
+def scan_for_exfil_endpoints(root: Path):
+    """Scan for known exfiltration endpoints like webhook.site."""
+    hits = []
+    dir_count = 0
+    pattern = re.compile("|".join(re.escape(e) for e in IOC_EXFIL_ENDPOINTS), re.IGNORECASE)
+
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dir_count += 1
+        progress(dir_count)
+
+        base = os.path.basename(dirpath)
+        if base in {".git", ".cache", "node_modules", ".npm", ".pnpm-store"}:
+            dirnames[:] = []
+            continue
+
+        for name in filenames:
+            if not name.endswith((".js", ".ts", ".mjs", ".cjs", ".jsx", ".tsx", ".yml", ".yaml", ".json")):
+                continue
+            path = Path(dirpath) / name
+            try:
+                size = path.stat().st_size
+            except (FileNotFoundError, OSError):
+                continue
+            if size > 1024 * 1024:
+                continue
+            if not is_text_file(path):
+                continue
+            try:
+                content = path.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            match = pattern.search(content)
+            if match:
+                matched_endpoint = match.group(0)
+                for i, line in enumerate(content.splitlines(), 1):
+                    if matched_endpoint.lower() in line.lower():
+                        snippet = f"line {i}: {line.strip()[:80]}"
+                        hits.append((str(path), matched_endpoint, snippet))
+                        break
+                else:
+                    hits.append((str(path), matched_endpoint, None))
+
+    return hits
+
+
+def scan_for_crypto_theft(root: Path):
+    """Scan for cryptocurrency theft patterns from chalk/debug attack."""
+    hits = []
+    dir_count = 0
+    
+    # Patterns for crypto theft detection
+    wallet_pattern = re.compile("|".join(re.escape(w) for w in ATTACKER_WALLETS))
+    func_pattern = re.compile("|".join(re.escape(f) for f in CRYPTO_THEFT_FUNCTIONS))
+    xhr_pattern = re.compile(r"XMLHttpRequest\.prototype\.send")
+    
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dir_count += 1
+        progress(dir_count)
+
+        base = os.path.basename(dirpath)
+        if base in {".git", ".cache", "node_modules", ".npm", ".pnpm-store"}:
+            dirnames[:] = []
+            continue
+
+        for name in filenames:
+            if not name.endswith((".js", ".ts", ".mjs", ".cjs", ".jsx", ".tsx")):
+                continue
+            path = Path(dirpath) / name
+            try:
+                size = path.stat().st_size
+            except (FileNotFoundError, OSError):
+                continue
+            if size > 1024 * 1024:
+                continue
+            if not is_text_file(path):
+                continue
+            try:
+                content = path.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            
+            findings = []
+            
+            # Check for known attacker wallets
+            wallet_match = wallet_pattern.search(content)
+            if wallet_match:
+                findings.append(f"attacker wallet: {wallet_match.group(0)}")
+            
+            # Check for known malicious function names
+            func_match = func_pattern.search(content)
+            if func_match:
+                findings.append(f"crypto theft function: {func_match.group(0)}")
+            
+            # Check for XMLHttpRequest prototype hijacking
+            if xhr_pattern.search(content):
+                # Only flag if combined with other suspicious patterns
+                eth_addr = re.search(r"0x[a-fA-F0-9]{40}", content)
+                if eth_addr or wallet_match or func_match:
+                    findings.append("XMLHttpRequest hijacking + crypto patterns")
+            
+            if findings:
+                hits.append((str(path), findings))
+
+    return hits
+
+
+def scan_for_destructive_payloads(root: Path):
+    """Scan for destructive payload patterns (fallback when theft fails)."""
+    hits = []
+    dir_count = 0
+    patterns = [re.compile(p, re.IGNORECASE) for p in DESTRUCTIVE_PATTERNS]
+
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dir_count += 1
+        progress(dir_count)
+
+        base = os.path.basename(dirpath)
+        if base in {".git", ".cache", "node_modules", ".npm", ".pnpm-store"}:
+            dirnames[:] = []
+            continue
+
+        for name in filenames:
+            if not name.endswith((".js", ".ts", ".sh", ".bash", ".ps1", ".bat", ".cmd", ".py")):
+                continue
+            path = Path(dirpath) / name
+            try:
+                size = path.stat().st_size
+            except (FileNotFoundError, OSError):
+                continue
+            if size > 512 * 1024:
+                continue
+            if not is_text_file(path):
+                continue
+            try:
+                content = path.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            
+            for pattern in patterns:
+                match = pattern.search(content)
+                if match:
+                    for i, line in enumerate(content.splitlines(), 1):
+                        if pattern.search(line):
+                            snippet = f"line {i}: {line.strip()[:80]}"
+                            hits.append((str(path), match.group(0), snippet))
+                            break
+                    break
+
+    return hits
+
+
+def scan_for_runner_backdoors(root: Path):
+    """Scan for self-hosted runner backdoor patterns (.dev-env/, SHA1HULUD)."""
+    hits = []
+    dir_count = 0
+
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dir_count += 1
+        progress(dir_count)
+
+        base = os.path.basename(dirpath)
+        if base in {".git", ".cache", "node_modules"}:
+            dirnames[:] = []
+            continue
+
+        # Check for .dev-env backdoor directory
+        if ".dev-env" in dirnames:
+            dev_env_path = Path(dirpath) / ".dev-env"
+            hits.append((str(dev_env_path), "Potential runner backdoor directory"))
+
+        # Check directory names for SHA1HULUD pattern
+        for dirname in dirnames:
+            for pattern in RUNNER_BACKDOOR_PATTERNS:
+                if pattern.lower() in dirname.lower():
+                    hits.append((str(Path(dirpath) / dirname), f"Runner backdoor pattern: {pattern}"))
+
+        # Check workflow files for self-hosted runners with suspicious names
+        for name in filenames:
+            if not name.endswith((".yml", ".yaml")):
+                continue
+            path = Path(dirpath) / name
+            try:
+                content = path.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            
+            for pattern in RUNNER_BACKDOOR_PATTERNS:
+                if pattern.lower() in content.lower():
+                    hits.append((str(path), f"Self-hosted runner pattern: {pattern}"))
+                    break
+
+    return hits
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Scan for Shai-Hulud npm supply-chain IOCs on a local tree."
@@ -1104,6 +1442,11 @@ def main():
         print(f"[!] Root path does not exist: {root}", file=sys.stderr)
         sys.exit(1)
 
+    # Load compromised packages from external file
+    pkg_count = load_compromised_packages_file()
+    if not args.json and pkg_count > 0:
+        print(f"[*] Loaded {pkg_count} compromised package versions from database\n")
+
     global _progress_bar
     
     show_progress = not args.json and not args.quiet and sys.stderr.isatty()
@@ -1111,14 +1454,14 @@ def main():
     if not args.json:
         print(f"[*] Scanning {root} for Shai-Hulud indicators...\n")
     
-    # Count directories for progress bar (16 scan phases)
+    # Count directories for progress bar (21 scan phases now)
     skip_dirs = {".git", ".cache", "node_modules", ".npm", ".pnpm-store"}
     if show_progress:
         sys.stderr.write("Counting directories...\r")
         sys.stderr.flush()
         total_dirs = count_directories(root, skip_dirs)
         # Multiply by number of scan passes (roughly)
-        total_work = total_dirs * 16
+        total_work = total_dirs * 21
         _progress_bar = ProgressBar(total_work, desc="Scanning", enabled=True)
     
     # Core IOC scans
@@ -1138,10 +1481,19 @@ def main():
         _progress_bar.set_description("Lockfiles")
     lock_matches = scan_lockfiles_for_packages(root)
 
+    # Hash verification against known malicious files
+    if show_progress:
+        _progress_bar.set_description("Hash check")
+    malicious_hashes = scan_for_malicious_hashes(root)
+
     # Extended detection vectors
     if show_progress:
         _progress_bar.set_description("Domains")
     malicious_domains = scan_for_malicious_domains(root)
+    
+    if show_progress:
+        _progress_bar.set_description("Exfil endpoints")
+    exfil_endpoints = scan_for_exfil_endpoints(root)
     
     if show_progress:
         _progress_bar.set_description("Scripts")
@@ -1158,6 +1510,21 @@ def main():
     if show_progress:
         _progress_bar.set_description("GH Actions")
     actions_secrets = scan_github_actions_secrets(root)
+
+    # Crypto theft detection (chalk/debug attack)
+    if show_progress:
+        _progress_bar.set_description("Crypto theft")
+    crypto_theft = scan_for_crypto_theft(root)
+    
+    # Destructive payload detection
+    if show_progress:
+        _progress_bar.set_description("Destructive")
+    destructive_payloads = scan_for_destructive_payloads(root)
+    
+    # Runner backdoor detection
+    if show_progress:
+        _progress_bar.set_description("Backdoors")
+    runner_backdoors = scan_for_runner_backdoors(root)
 
     # Git repository scanning
     if show_progress:
@@ -1200,7 +1567,12 @@ def main():
         "ioc_files": ioc_files,
         "suspicious_workflows": workflows,
         "compromised_packages": lock_matches,
+        "malicious_hashes": malicious_hashes,  # CRITICAL: Known malicious file hashes
         "malicious_domains": malicious_domains,
+        "exfil_endpoints": exfil_endpoints,  # webhook.site, etc.
+        "crypto_theft": crypto_theft,  # Crypto theft patterns
+        "destructive_payloads": destructive_payloads,  # rm -rf $HOME, etc.
+        "runner_backdoors": runner_backdoors,  # .dev-env/, SHA1HULUD
         "actions_secrets_exposure": [(p, pats) for p, pats in actions_secrets],
         "git_branches": git_branches,
         "git_remotes": git_remotes,
@@ -1353,11 +1725,19 @@ def main():
         for lf, pkgs in lock_matches.items():
             print(f"    {C_DIM}📦{C_RESET} {lf}")
             for pkg_name, pkg_version, vuln_ranges in pkgs:
-                if vuln_ranges is None:
+                if vuln_ranges == "exact match":
+                    range_str = "exact match from database"
+                elif vuln_ranges is None:
                     range_str = "all versions"
                 else:
                     range_str = ", ".join(f"{r[0] or '0'}-{r[1] or 'latest'}" for r in vuln_ranges)
                 print(f"       {C_RED}✗{C_RESET} {pkg_name}@{C_RED}{pkg_version}{C_RESET} {C_DIM}({range_str}){C_RESET}")
+
+    if malicious_hashes:
+        print(section_header("☠", "CRITICAL: Known malicious file hashes detected", C_RED))
+        for path, file_hash in malicious_hashes:
+            print(f"    {C_DIM}📄{C_RESET} {path}")
+            print(f"       {C_RED}✗{C_RESET} SHA256: {C_RED}{file_hash[:16]}...{C_RESET}")
 
     if malicious_domains:
         print(section_header("⛔", "HIGH: Malicious domains found", C_RED))
@@ -1366,6 +1746,35 @@ def main():
             print(f"       {C_RED}✗{C_RESET} matched: {C_RED}{domain}{C_RESET}")
             if snippet:
                 print(f"       {C_DIM}└─ {snippet}{C_RESET}")
+
+    if exfil_endpoints:
+        print(section_header("⛔", "HIGH: Exfiltration endpoints found (webhook.site, etc.)", C_RED))
+        for path, endpoint, snippet in exfil_endpoints:
+            print(f"    {C_DIM}📄{C_RESET} {path}")
+            print(f"       {C_RED}✗{C_RESET} endpoint: {C_RED}{endpoint}{C_RESET}")
+            if snippet:
+                print(f"       {C_DIM}└─ {snippet}{C_RESET}")
+
+    if crypto_theft:
+        print(section_header("⛔", "HIGH: Cryptocurrency theft patterns detected", C_RED))
+        for path, findings in crypto_theft:
+            print(f"    {C_DIM}📄{C_RESET} {path}")
+            for finding in findings:
+                print(f"       {C_RED}✗{C_RESET} {finding}")
+
+    if destructive_payloads:
+        print(section_header("⛔", "HIGH: Destructive payload patterns detected", C_RED))
+        for path, pattern, snippet in destructive_payloads:
+            print(f"    {C_DIM}📄{C_RESET} {path}")
+            print(f"       {C_RED}✗{C_RESET} pattern: {C_RED}{pattern}{C_RESET}")
+            if snippet:
+                print(f"       {C_DIM}└─ {snippet}{C_RESET}")
+
+    if runner_backdoors:
+        print(section_header("⛔", "HIGH: Self-hosted runner backdoor patterns", C_RED))
+        for path, description in runner_backdoors:
+            print(f"    {C_DIM}📄{C_RESET} {path}")
+            print(f"       {C_RED}✗{C_RESET} {description}")
 
     if actions_secrets:
         print(section_header("⛔", "HIGH: Secrets exposure in GitHub Actions", C_RED))

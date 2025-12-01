@@ -14,7 +14,13 @@ Shai-Hulud is a sophisticated npm supply chain attack that has compromised hundr
 
 ## Features
 
-- **16 detection vectors** covering files, packages, code patterns, and configurations
+- **21 detection vectors** covering files, packages, code patterns, and configurations
+- **1,677+ compromised packages** database from multiple security advisories
+- **Known malicious file hashes** - SHA256 verification against 7 known malicious bundles
+- **Cryptocurrency theft detection** - wallet addresses, malicious functions from chalk/debug attack
+- **Exfiltration endpoint detection** - webhook.site, Discord webhooks, Telegram, etc.
+- **Destructive payload detection** - `rm -rf $HOME`, `fs.rmSync` with recursive
+- **Self-hosted runner backdoor detection** - `.dev-env/`, SHA1HULUD patterns
 - **Matched content display** - see exactly what triggered each finding
 - **Severity classification** - Critical, High, Medium, Low
 - **Progress bar** with phase indicators
@@ -85,8 +91,13 @@ python scan_shai_hulud.py -q /path/to/project
 
 | Detection | Description |
 |-----------|-------------|
-| Compromised Packages | 40+ known compromised packages with version ranges |
+| Compromised Packages | 1,677+ known compromised package versions |
+| Malicious File Hashes | SHA256 match against 7 known malicious bundle.js variants |
 | Malicious Domains | Known exfiltration endpoints (`npm-stats.com`, etc.) |
+| Exfil Endpoints | webhook.site, Discord webhooks, Telegram, ngrok, etc. |
+| Crypto Theft | Attacker wallet addresses, malicious function names |
+| Destructive Payloads | `rm -rf $HOME`, `fs.rmSync` recursive delete patterns |
+| Runner Backdoors | `.dev-env/` directories, SHA1HULUD self-hosted runners |
 | Secrets Exposure | GitHub Actions leaking secrets via echo, curl, toJSON |
 | .npmrc Issues | Non-standard registries, exposed auth tokens |
 
@@ -154,16 +165,35 @@ python scan_shai_hulud.py -q /path/to/project
 
 ## Compromised Packages
 
-The scanner checks for 40+ known compromised packages including:
+The scanner includes a comprehensive database of **1,677+ compromised package versions** from multiple attack campaigns:
 
-- `@ctrl/tinycolor`, `@ctrl/ngx-codemirror`
-- `@asyncapi/specs`, `@asyncapi/cli`
-- `@zapier/zapier-sdk`, `@zapier/secret-scrubber`
-- `@solana/web3.js` (versions 1.95.5-1.95.7)
-- `@lottiefiles/lottie-player` (versions 2.0.4-2.0.8)
-- `event-stream`, `flatmap-stream`
-- `coa`, `rc`, `ua-parser-js`
-- And more...
+**September 2025 - Chalk/Debug Crypto Theft Attack:**
+- Popular packages with 2+ billion weekly downloads: `chalk`, `debug`, `ansi-styles`, `supports-color`
+- XMLHttpRequest hijacking to steal cryptocurrency wallet addresses
+
+**September/November 2025 - Shai-Hulud Worm:**
+- `@ctrl/tinycolor`, `@ctrl/ngx-codemirror`, `@ctrl/deluge`
+- `@asyncapi/*`, `@zapier/*`, `@ensdomains/*`, `@posthog/*`
+- `@crowdstrike/*`, `@art-ws/*`, `@postman/*`
+- Self-replicating via compromised maintainer accounts
+
+**November 2025 - "Second Coming" Fake Bun Attack:**
+- Fake Bun runtime installer via `setup_bun.js`
+- Automated TruffleHog credential scanning
+- Self-hosted GitHub Actions runner backdoors
+
+**Historical Supply Chain Attacks:**
+- `event-stream`, `flatmap-stream` (2018)
+- `coa`, `rc`, `ua-parser-js` (2021)
+- `colors`, `faker` protestware (2022)
+- `node-ipc` peacenotwar malware (2022)
+
+The package list is maintained in `compromised-packages.txt` and sourced from:
+- [StepSecurity](https://www.stepsecurity.io/blog/ctrl-tinycolor-and-40-npm-packages-compromised)
+- [Semgrep Security Advisory](https://semgrep.dev/blog/2025/security-advisory-npm-packages-using-secret-scanning-tools-to-steal-credentials/)
+- [JFrog](https://jfrog.com/blog/shai-hulud-npm-supply-chain-attack-new-compromised-packages-detected/)
+- [Socket.dev](https://socket.dev/blog/ongoing-supply-chain-attack-targets-crowdstrike-npm-packages)
+- [Cobenian/shai-hulud-detect](https://github.com/Cobenian/shai-hulud-detect)
 
 ## What To Do If Compromised
 
@@ -203,13 +233,25 @@ MIT
 
 PRs welcome! If you discover new IOCs or compromised packages, please open an issue or PR.
 
-To add new compromised packages, update the `COMPROMISED_PACKAGES` dict in `scan_shai_hulud.py`:
+**To add new compromised packages**, edit `compromised-packages.txt`:
+
+```
+# Format: package_name:version (one per line)
+# Lines starting with # are comments
+@scope/package-name:1.2.3
+another-package:4.5.6
+```
+
+**To add new detection patterns**, edit the relevant constants in `scan_shai_hulud.py`:
 
 ```python
-COMPROMISED_PACKAGES = {
-    # Format: "package-name": [("min_version", "max_version"), ...] or None for all versions
-    "new-bad-package": [("1.0.0", "1.0.5")],  # Specific version range
-    "another-bad-package": None,  # All versions compromised
-}
+# Known malicious file hashes
+MALICIOUS_HASHES = {"sha256hash..."}
+
+# Exfiltration endpoints
+IOC_EXFIL_ENDPOINTS = {"webhook.site", ...}
+
+# Attacker wallet addresses
+ATTACKER_WALLETS = {"0x...", ...}
 ```
 
