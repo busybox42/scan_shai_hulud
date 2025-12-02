@@ -194,6 +194,9 @@ The package list is maintained in `compromised-packages.txt` and sourced from:
 - [JFrog](https://jfrog.com/blog/shai-hulud-npm-supply-chain-attack-new-compromised-packages-detected/)
 - [Socket.dev](https://socket.dev/blog/ongoing-supply-chain-attack-targets-crowdstrike-npm-packages)
 - [Cobenian/shai-hulud-detect](https://github.com/Cobenian/shai-hulud-detect)
+- [gensecaihq/Shai-Hulud-2.0-Detector](https://github.com/gensecaihq/Shai-Hulud-2.0-Detector)
+- [Aikido Security](https://www.aikido.dev/blog/shai-hulud-strikes-again-hitting-zapier-ensdomains)
+- [Wiz.io](https://www.wiz.io/blog/shai-hulud-2-0-ongoing-supply-chain-attack)
 
 ## What To Do If Compromised
 
@@ -220,10 +223,19 @@ If the scanner finds **High/Critical** severity issues:
 
 ## References
 
+**Primary Sources:**
+- [Aikido Security: Shai-Hulud Strikes Again](https://www.aikido.dev/blog/shai-hulud-strikes-again-hitting-zapier-ensdomains)
+- [Wiz.io: Shai-Hulud 2.0 Investigation](https://www.wiz.io/blog/shai-hulud-2-0-ongoing-supply-chain-attack)
 - [Orca Security: Shai-Hulud Wave 2 Analysis](https://orca.security/resources/blog/shai-hulud-npm-malware-wave-2/)
+- [StepSecurity: @ctrl/tinycolor Compromise](https://www.stepsecurity.io/blog/ctrl-tinycolor-and-40-npm-packages-compromised)
+
+**Detection Tools:**
+- [Cobenian/shai-hulud-detect](https://github.com/Cobenian/shai-hulud-detect) - Bash-based detector (1677+ packages)
+- [gensecaihq/Shai-Hulud-2.0-Detector](https://github.com/gensecaihq/Shai-Hulud-2.0-Detector) - GitHub Action with SARIF support
+
+**Additional Resources:**
 - [Kaspersky Securelist: Shai-Hulud Worm Analysis](https://securelist.com/shai-hulud-worm-infects-500-npm-packages-in-a-supply-chain-attack/)
 - [Cohesity: Supply Chain Compromise Advisory](https://www.cohesity.com/trust/redlab/advisories/supply-chain-compromise-shai-hulud/)
-- [StepSecurity: @ctrl/tinycolor Compromise](https://www.stepsecurity.io/blog/ctrl-tinycolor-and-40-npm-packages-compromised)
 
 ## License
 
