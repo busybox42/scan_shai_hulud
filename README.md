@@ -24,8 +24,11 @@ Shai-Hulud is a sophisticated npm supply chain attack that has compromised hundr
 - **Matched content display** - see exactly what triggered each finding
 - **Severity classification** - Critical, High, Medium, Low
 - **Progress bar** with phase indicators
-- **CI/CD integration** - exit codes and JSON output
-- **Zero dependencies** - single Python file, stdlib only
+- **CI/CD integration** - exit codes, JSON, and SARIF output
+- **CSV forensic reports** - detailed findings for incident response
+- **npm cache scanning** - detect cached compromised packages
+- **Live IOC updates** - fetch latest threat intel from community feeds
+- **Zero dependencies** - pure Python stdlib
 
 ## Installation
 
@@ -53,9 +56,31 @@ python scan_shai_hulud.py /path/to/project
 # JSON output for CI/CD
 python scan_shai_hulud.py --json /path/to/project
 
+# SARIF output for GitHub Security tab
+python scan_shai_hulud.py --sarif /path/to/project > results.sarif
+
+# Generate CSV forensic report
+python scan_shai_hulud.py --csv report.csv /path/to/project
+
+# Also scan npm/yarn/pnpm cache for compromised packages
+python scan_shai_hulud.py --scan-cache /path/to/project
+
 # Quiet mode (no progress bar)
 python scan_shai_hulud.py -q /path/to/project
+
+# Update IOC database from community feeds
+python update_iocs.py
 ```
+
+### CLI Options
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Output results as JSON |
+| `--sarif` | Output results as SARIF (GitHub Security tab) |
+| `--csv FILE` | Write CSV forensic report to FILE |
+| `--scan-cache` | Also scan npm/yarn/pnpm cache directories |
+| `-q, --quiet` | Suppress progress bar |
 
 ### Exit Codes
 
@@ -68,7 +93,19 @@ python scan_shai_hulud.py -q /path/to/project
 ### CI/CD Integration
 
 ```yaml
-# GitHub Actions example
+# GitHub Actions example with SARIF upload
+- name: Scan for Shai-Hulud
+  run: python scan_shai_hulud.py --sarif . > results.sarif
+  continue-on-error: true
+
+- name: Upload SARIF to GitHub Security
+  uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: results.sarif
+```
+
+```yaml
+# Simple check with JSON output
 - name: Scan for Shai-Hulud
   run: |
     python scan_shai_hulud.py --json . > scan_results.json
@@ -100,6 +137,7 @@ python scan_shai_hulud.py -q /path/to/project
 | Runner Backdoors | `.dev-env/` directories, SHA1HULUD self-hosted runners |
 | Secrets Exposure | GitHub Actions leaking secrets via echo, curl, toJSON |
 | .npmrc Issues | Non-standard registries, exposed auth tokens |
+| npm Cache | Compromised packages in `~/.npm/_cacache` (with `--scan-cache`) |
 
 ### ⚠️ Medium Severity
 
@@ -187,6 +225,18 @@ The scanner includes a comprehensive database of **1,677+ compromised package ve
 - `coa`, `rc`, `ua-parser-js` (2021)
 - `colors`, `faker` protestware (2022)
 - `node-ipc` peacenotwar malware (2022)
+
+### Updating the IOC Database
+
+Keep your IOC database current with the latest threat intelligence:
+
+```bash
+python update_iocs.py
+```
+
+This fetches from:
+- [Cobenian/shai-hulud-detect](https://github.com/Cobenian/shai-hulud-detect)
+- [CyberDracula/shai-hulud-2-scanner](https://github.com/CyberDracula/shai-hulud-2-scanner)
 
 The package list is maintained in `data/compromised-packages.txt` and sourced from:
 - [StepSecurity](https://www.stepsecurity.io/blog/ctrl-tinycolor-and-40-npm-packages-compromised)
