@@ -1,6 +1,7 @@
 
 # Last updated: 2025-12-02T01:20:40.665580+00:00
 
+
 02-echo:0.0.7
 @accordproject/concerto-analysis:3.24.1
 @accordproject/concerto-linter:3.24.1
@@ -39,8 +40,10 @@
 @alexadark/gatsby-theme-wordpress-blog:2.0.1
 @alexadark/reusable-functions:1.5.1
 @alexcolls/nuxt-socket.io:0.0.7
+@alexcolls/nuxt-socket.io:0.0.7 || = 0.0.8
 @alexcolls/nuxt-socket.io:0.0.8
 @alexcolls/nuxt-ux:0.6.1
+@alexcolls/nuxt-ux:0.6.1 || = 0.6.2
 @alexcolls/nuxt-ux:0.6.2
 @antstackio/eslint-config-antstack:0.0.3
 @antstackio/express-graphql-proxy:0.2.8
@@ -88,82 +91,118 @@
 @art-ws/web-app:1.0.4
 @aryanhussain/my-angular-lib:0.0.23
 @asyncapi/avro-schema-parser:3.0.25
+@asyncapi/avro-schema-parser:3.0.25 || = 3.0.26
 @asyncapi/avro-schema-parser:3.0.26
 @asyncapi/bundler:0.6.5
+@asyncapi/bundler:0.6.5 || = 0.6.6
 @asyncapi/bundler:0.6.6
 @asyncapi/cli:4.1.2
 @asyncapi/cli:4.1.3
+@asyncapi/cli:4.1.3 || = 4.1.2
 @asyncapi/converter:1.6.3
+@asyncapi/converter:1.6.3 || = 1.6.4
 @asyncapi/converter:1.6.4
 @asyncapi/diff:0.5.1
+@asyncapi/diff:0.5.1 || = 0.5.2
 @asyncapi/diff:0.5.2
 @asyncapi/dotnet-rabbitmq-template:1.0.1
 @asyncapi/dotnet-rabbitmq-template:1.0.2
+@asyncapi/dotnet-rabbitmq-template:1.0.2 || = 1.0.1
 @asyncapi/edavisualiser:1.2.1
 @asyncapi/edavisualiser:1.2.2
+@asyncapi/edavisualiser:1.2.2 || = 1.2.1
 @asyncapi/generator:2.8.5
+@asyncapi/generator:2.8.5 || = 2.8.6
 @asyncapi/generator:2.8.6
 @asyncapi/generator-components:0.3.2
+@asyncapi/generator-components:0.3.2 || = 0.3.3
 @asyncapi/generator-components:0.3.3
 @asyncapi/generator-helpers:0.2.1
+@asyncapi/generator-helpers:0.2.1 || = 0.2.2
 @asyncapi/generator-helpers:0.2.2
 @asyncapi/generator-react-sdk:1.1.4
 @asyncapi/generator-react-sdk:1.1.5
+@asyncapi/generator-react-sdk:1.1.5 || = 1.1.4
 @asyncapi/go-watermill-template:0.2.76
 @asyncapi/go-watermill-template:0.2.77
+@asyncapi/go-watermill-template:0.2.77 || = 0.2.76
 @asyncapi/html-template:3.3.2
+@asyncapi/html-template:3.3.2 || = 3.3.3
 @asyncapi/html-template:3.3.3
 @asyncapi/java-spring-cloud-stream-template:0.13.5
+@asyncapi/java-spring-cloud-stream-template:0.13.5 || = 0.13.6
 @asyncapi/java-spring-cloud-stream-template:0.13.6
 @asyncapi/java-spring-template:1.6.1
 @asyncapi/java-spring-template:1.6.2
+@asyncapi/java-spring-template:1.6.2 || = 1.6.1
 @asyncapi/java-template:0.3.5
 @asyncapi/java-template:0.3.6
+@asyncapi/java-template:0.3.6 || = 0.3.5
 @asyncapi/keeper:0.0.2
+@asyncapi/keeper:0.0.2 || = 0.0.3
 @asyncapi/keeper:0.0.3
 @asyncapi/markdown-template:1.6.8
+@asyncapi/markdown-template:1.6.8 || = 1.6.9
 @asyncapi/markdown-template:1.6.9
 @asyncapi/modelina:5.10.2
 @asyncapi/modelina:5.10.3
+@asyncapi/modelina:5.10.3 || = 5.10.2
 @asyncapi/modelina-cli:5.10.2
 @asyncapi/modelina-cli:5.10.3
+@asyncapi/modelina-cli:5.10.3 || = 5.10.2
 @asyncapi/multi-parser:2.2.1
+@asyncapi/multi-parser:2.2.1 || = 2.2.2
 @asyncapi/multi-parser:2.2.2
 @asyncapi/nodejs-template:3.0.5
 @asyncapi/nodejs-template:3.0.6
+@asyncapi/nodejs-template:3.0.6 || = 3.0.5
 @asyncapi/nodejs-ws-template:0.10.1
+@asyncapi/nodejs-ws-template:0.10.1 || = 0.10.2
 @asyncapi/nodejs-ws-template:0.10.2
 @asyncapi/nunjucks-filters:2.1.1
+@asyncapi/nunjucks-filters:2.1.1 || = 2.1.2
 @asyncapi/nunjucks-filters:2.1.2
 @asyncapi/openapi-schema-parser:3.0.25
+@asyncapi/openapi-schema-parser:3.0.25 || = 3.0.26
 @asyncapi/openapi-schema-parser:3.0.26
 @asyncapi/optimizer:1.0.5
 @asyncapi/optimizer:1.0.6
+@asyncapi/optimizer:1.0.6 || = 1.0.5
 @asyncapi/parser:3.4.1
+@asyncapi/parser:3.4.1 || = 3.4.2
 @asyncapi/parser:3.4.2
 @asyncapi/php-template:0.1.1
+@asyncapi/php-template:0.1.1 || = 0.1.2
 @asyncapi/php-template:0.1.2
 @asyncapi/problem:1.0.1
 @asyncapi/problem:1.0.2
+@asyncapi/problem:1.0.2 || = 1.0.1
 @asyncapi/protobuf-schema-parser:3.5.2
+@asyncapi/protobuf-schema-parser:3.5.2 || = 3.6.1 || = 3.5.3
 @asyncapi/protobuf-schema-parser:3.5.3
 @asyncapi/protobuf-schema-parser:3.6.1
 @asyncapi/python-paho-template:0.2.14
 @asyncapi/python-paho-template:0.2.15
+@asyncapi/python-paho-template:0.2.15 || = 0.2.14
 @asyncapi/react-component:2.6.6
 @asyncapi/react-component:2.6.7
+@asyncapi/react-component:2.6.7 || = 2.6.6
 @asyncapi/server-api:0.16.24
+@asyncapi/server-api:0.16.24 || = 0.16.25
 @asyncapi/server-api:0.16.25
 @asyncapi/specs:6.10.1
 @asyncapi/specs:6.8.2
 @asyncapi/specs:6.8.3
 @asyncapi/specs:6.9.1
+@asyncapi/specs:6.9.1 || = 6.10.1 || = 6.8.3 || = 6.8.2
 @asyncapi/studio:0.20.1
 @asyncapi/studio:0.20.2
 @asyncapi/studio:1.0.2
 @asyncapi/studio:1.0.3
+@asyncapi/studio:1.0.3 || = 1.0.2
 @asyncapi/web-component:2.6.6
 @asyncapi/web-component:2.6.7
+@asyncapi/web-component:2.6.7 || = 2.6.6
 @basic-ui-components-stc/basic-ui-components:1.0.5
 @bdkinc/knex-ibmi:0.5.7
 @bonk-sdk/ipfs:1.0.11
@@ -315,9 +354,12 @@
 @eqder/bird:13.0.0
 @everreal/react-charts:2.0.1
 @everreal/react-charts:2.0.2
+@everreal/react-charts:2.0.2 || = 2.0.1
 @everreal/validate-esmoduleinterop-imports:1.4.4
 @everreal/validate-esmoduleinterop-imports:1.4.5
+@everreal/validate-esmoduleinterop-imports:1.4.5 || = 1.4.4
 @everreal/web-analytics:0.0.1
+@everreal/web-analytics:0.0.1 || = 0.0.2
 @everreal/web-analytics:0.0.2
 @faq-component/core:0.0.4
 @faq-component/react:1.0.1
@@ -353,6 +395,7 @@
 @huntersofbook/ui:0.5.1
 @hyperlook/telemetry-sdk:1.0.19
 @ifelsedeveloper/protocol-contracts-svm-idl:0.1.2
+@ifelsedeveloper/protocol-contracts-svm-idl:0.1.2 || = 0.1.3
 @ifelsedeveloper/protocol-contracts-svm-idl:0.1.3
 @ifings/design-system:4.9.2
 @ifings/metatron3:0.1.5
@@ -371,6 +414,7 @@
 @kvytech/medusa-plugin-promotion:0.0.2
 @kvytech/web:0.0.2
 @lessondesk/api-client:9.12.2
+@lessondesk/api-client:9.12.2 || = 9.12.3
 @lessondesk/api-client:9.12.3
 @lessondesk/babel-preset:1.0.1
 @lessondesk/electron-group-api-client:1.0.3
@@ -378,6 +422,7 @@
 @lessondesk/material-icons:1.0.3
 @lessondesk/react-table-context:2.0.4
 @lessondesk/schoolbus:5.2.2
+@lessondesk/schoolbus:5.2.2 || = 5.2.3
 @lessondesk/schoolbus:5.2.3
 @liquid-web/app-services:1.2.9213
 @liquid-web/common:1.2.9213
@@ -399,12 +444,16 @@
 @lui-ui/lui-vue:1.0.13
 @markvivanco/app-version-checker:1.0.1
 @markvivanco/app-version-checker:1.0.2
+@markvivanco/app-version-checker:1.0.2 || = 1.0.1
 @mcp-use/cli:2.2.6
 @mcp-use/cli:2.2.7
+@mcp-use/cli:2.2.7 || = 2.2.6
 @mcp-use/inspector:0.6.2
 @mcp-use/inspector:0.6.3
+@mcp-use/inspector:0.6.3 || = 0.6.2
 @mcp-use/mcp-use:1.0.1
 @mcp-use/mcp-use:1.0.2
+@mcp-use/mcp-use:1.0.2 || = 1.0.1
 @micado-digital/stadtmarketing-kufstein-external:1.9.1
 @mizzle-dev/orm:0.0.2
 @mparpaillon/connector-parse:1.0.1
@@ -780,54 +829,71 @@
 @posthog/wizard:1.18.1
 @posthog/zendesk-plugin:0.0.8
 @postman/aether-icons:2.23.2
+@postman/aether-icons:2.23.2 || = 2.23.3 || = 2.23.4
 @postman/aether-icons:2.23.3
 @postman/aether-icons:2.23.4
 @postman/csv-parse:4.0.3
+@postman/csv-parse:4.0.3 || = 4.0.5 || = 4.0.4
 @postman/csv-parse:4.0.4
 @postman/csv-parse:4.0.5
 @postman/final-node-keytar:7.9.1
 @postman/final-node-keytar:7.9.2
 @postman/final-node-keytar:7.9.3
+@postman/final-node-keytar:7.9.3 || = 7.9.1 || = 7.9.2
 @postman/mcp-ui-client:5.5.1
 @postman/mcp-ui-client:5.5.2
+@postman/mcp-ui-client:5.5.2 || = 5.5.3 || = 5.5.1
 @postman/mcp-ui-client:5.5.3
 @postman/node-keytar:7.9.4
+@postman/node-keytar:7.9.4 || = 7.9.5 || = 7.9.6
 @postman/node-keytar:7.9.5
 @postman/node-keytar:7.9.6
 @postman/pm-bin-linux-x64:1.24.3
+@postman/pm-bin-linux-x64:1.24.3 || = 1.24.5 || = 1.24.4
 @postman/pm-bin-linux-x64:1.24.4
 @postman/pm-bin-linux-x64:1.24.5
 @postman/pm-bin-macos-arm64:1.24.3
+@postman/pm-bin-macos-arm64:1.24.3 || = 1.24.5 || = 1.24.4
 @postman/pm-bin-macos-arm64:1.24.4
 @postman/pm-bin-macos-arm64:1.24.5
 @postman/pm-bin-macos-x64:1.24.3
+@postman/pm-bin-macos-x64:1.24.3 || = 1.24.5 || = 1.24.4
 @postman/pm-bin-macos-x64:1.24.4
 @postman/pm-bin-macos-x64:1.24.5
 @postman/pm-bin-windows-x64:1.24.3
+@postman/pm-bin-windows-x64:1.24.3 || = 1.24.5 || = 1.24.4
 @postman/pm-bin-windows-x64:1.24.4
 @postman/pm-bin-windows-x64:1.24.5
 @postman/postman-collection-fork:4.3.3
+@postman/postman-collection-fork:4.3.3 || = 4.3.5 || = 4.3.4
 @postman/postman-collection-fork:4.3.4
 @postman/postman-collection-fork:4.3.5
 @postman/postman-mcp-cli:1.0.3
 @postman/postman-mcp-cli:1.0.4
+@postman/postman-mcp-cli:1.0.4 || = 1.0.5 || = 1.0.3
 @postman/postman-mcp-cli:1.0.5
 @postman/postman-mcp-server:2.4.10
 @postman/postman-mcp-server:2.4.11
 @postman/postman-mcp-server:2.4.12
+@postman/postman-mcp-server:2.4.12 || = 2.4.10 || = 2.4.11
 @postman/pretty-ms:6.1.1
 @postman/pretty-ms:6.1.2
+@postman/pretty-ms:6.1.2 || = 6.1.3 || = 6.1.1
 @postman/pretty-ms:6.1.3
 @postman/secret-scanner-wasm:2.1.2
 @postman/secret-scanner-wasm:2.1.3
 @postman/secret-scanner-wasm:2.1.4
+@postman/secret-scanner-wasm:2.1.4 || = 2.1.3 || = 2.1.2
 @postman/tunnel-agent:0.6.5
+@postman/tunnel-agent:0.6.5 || = 0.6.7 || = 0.6.6
 @postman/tunnel-agent:0.6.6
 @postman/tunnel-agent:0.6.7
 @postman/wdio-allure-reporter:0.0.7
+@postman/wdio-allure-reporter:0.0.7 || = 0.0.8 || = 0.0.9
 @postman/wdio-allure-reporter:0.0.8
 @postman/wdio-allure-reporter:0.0.9
 @postman/wdio-junit-reporter:0.0.4
+@postman/wdio-junit-reporter:0.0.4 || = 0.0.5 || = 0.0.6
 @postman/wdio-junit-reporter:0.0.5
 @postman/wdio-junit-reporter:0.0.6
 @pradhumngautam/common-app:1.0.2
@@ -998,9 +1064,11 @@
 @things-factory/shell:9.0.44
 @things-factory/shell:9.0.45
 @tiaanduplessis/json:2.0.2
+@tiaanduplessis/json:2.0.2 || = 2.0.3
 @tiaanduplessis/json:2.0.3
 @tiaanduplessis/react-progressbar:1.0.1
 @tiaanduplessis/react-progressbar:1.0.2
+@tiaanduplessis/react-progressbar:1.0.2 || = 1.0.1
 @tnf-dev/api:1.0.10
 @tnf-dev/api:1.0.10-0
 @tnf-dev/api:1.0.8
@@ -1056,127 +1124,186 @@
 @ui-ux-gang/devextreme-angular-rpk:24.1.7
 @ui-ux-gang/devextreme-rpk:24.1.7
 @varsityvibe/api-client:1.3.36
+@varsityvibe/api-client:1.3.36 || = 1.3.37
 @varsityvibe/api-client:1.3.37
 @varsityvibe/utils:5.0.6
 @varsityvibe/validation-schemas:0.6.7
+@varsityvibe/validation-schemas:0.6.7 || = 0.6.8
 @varsityvibe/validation-schemas:0.6.8
 @viapip/eslint-config:0.2.4
 @viihdeonline/react-app:172.0.0
 @viihdeonline/react-app:99.49.50
 @vishadtyagi/full-year-calendar:0.1.11
 @voiceflow/alexa-types:2.15.60
+@voiceflow/alexa-types:2.15.60 || = 2.15.61
 @voiceflow/alexa-types:2.15.61
 @voiceflow/anthropic:0.4.4
+@voiceflow/anthropic:0.4.4 || = 0.4.5
 @voiceflow/anthropic:0.4.5
 @voiceflow/api-sdk:3.28.58
 @voiceflow/api-sdk:3.28.59
+@voiceflow/api-sdk:3.28.59 || = 3.28.58
 @voiceflow/backend-utils:5.0.1
+@voiceflow/backend-utils:5.0.1 || = 5.0.2
 @voiceflow/backend-utils:5.0.2
 @voiceflow/base-types:2.136.2
 @voiceflow/base-types:2.136.3
+@voiceflow/base-types:2.136.3 || = 2.136.2
 @voiceflow/body-parser:1.21.2
 @voiceflow/body-parser:1.21.3
+@voiceflow/body-parser:1.21.3 || = 1.21.2
 @voiceflow/chat-types:2.14.58
 @voiceflow/chat-types:2.14.59
+@voiceflow/chat-types:2.14.59 || = 2.14.58
 @voiceflow/circleci-config-sdk-orb-import:0.2.1
+@voiceflow/circleci-config-sdk-orb-import:0.2.1 || = 0.2.2
 @voiceflow/circleci-config-sdk-orb-import:0.2.2
 @voiceflow/commitlint-config:2.6.1
 @voiceflow/commitlint-config:2.6.2
+@voiceflow/commitlint-config:2.6.2 || = 2.6.1
 @voiceflow/common:8.9.1
+@voiceflow/common:8.9.1 || = 8.9.2
 @voiceflow/common:8.9.2
 @voiceflow/default-prompt-wrappers:1.7.3
 @voiceflow/default-prompt-wrappers:1.7.4
+@voiceflow/default-prompt-wrappers:1.7.4 || = 1.7.3
 @voiceflow/dependency-cruiser-config:1.8.11
+@voiceflow/dependency-cruiser-config:1.8.11 || = 1.8.12
 @voiceflow/dependency-cruiser-config:1.8.12
 @voiceflow/dtos-interact:1.40.1
 @voiceflow/dtos-interact:1.40.2
+@voiceflow/dtos-interact:1.40.2 || = 1.40.1
 @voiceflow/encryption:0.3.2
+@voiceflow/encryption:0.3.2 || = 0.3.3
 @voiceflow/encryption:0.3.3
 @voiceflow/eslint-config:7.16.4
+@voiceflow/eslint-config:7.16.4 || = 7.16.5
 @voiceflow/eslint-config:7.16.5
 @voiceflow/eslint-plugin:1.6.1
 @voiceflow/eslint-plugin:1.6.2
+@voiceflow/eslint-plugin:1.6.2 || = 1.6.1
 @voiceflow/exception:1.10.1
+@voiceflow/exception:1.10.1 || = 1.10.2
 @voiceflow/exception:1.10.2
 @voiceflow/fetch:1.11.1
+@voiceflow/fetch:1.11.1 || = 1.11.2
 @voiceflow/fetch:1.11.2
 @voiceflow/general-types:3.2.22
+@voiceflow/general-types:3.2.22 || = 3.2.23
 @voiceflow/general-types:3.2.23
 @voiceflow/git-branch-check:1.4.3
+@voiceflow/git-branch-check:1.4.3 || = 1.4.4
 @voiceflow/git-branch-check:1.4.4
 @voiceflow/google-dfes-types:2.17.12
+@voiceflow/google-dfes-types:2.17.12 || = 2.17.13
 @voiceflow/google-dfes-types:2.17.13
 @voiceflow/google-types:2.21.12
+@voiceflow/google-types:2.21.12 || = 2.21.13
 @voiceflow/google-types:2.21.13
 @voiceflow/husky-config:1.3.1
 @voiceflow/husky-config:1.3.2
+@voiceflow/husky-config:1.3.2 || = 1.3.1
 @voiceflow/logger:2.4.2
 @voiceflow/logger:2.4.3
+@voiceflow/logger:2.4.3 || = 2.4.2
 @voiceflow/metrics:1.5.1
 @voiceflow/metrics:1.5.2
+@voiceflow/metrics:1.5.2 || = 1.5.1
 @voiceflow/natural-language-commander:0.5.2
+@voiceflow/natural-language-commander:0.5.2 || = 0.5.3
 @voiceflow/natural-language-commander:0.5.3
 @voiceflow/nestjs-common:2.75.2
 @voiceflow/nestjs-common:2.75.3
+@voiceflow/nestjs-common:2.75.3 || = 2.75.2
 @voiceflow/nestjs-mongodb:1.3.1
 @voiceflow/nestjs-mongodb:1.3.2
+@voiceflow/nestjs-mongodb:1.3.2 || = 1.3.1
 @voiceflow/nestjs-rate-limit:1.3.2
+@voiceflow/nestjs-rate-limit:1.3.2 || = 1.3.3
 @voiceflow/nestjs-rate-limit:1.3.3
 @voiceflow/nestjs-redis:1.3.1
 @voiceflow/nestjs-redis:1.3.2
+@voiceflow/nestjs-redis:1.3.2 || = 1.3.1
 @voiceflow/nestjs-timeout:1.3.1
 @voiceflow/nestjs-timeout:1.3.2
+@voiceflow/nestjs-timeout:1.3.2 || = 1.3.1
 @voiceflow/npm-package-json-lint-config:1.1.1
 @voiceflow/npm-package-json-lint-config:1.1.2
+@voiceflow/npm-package-json-lint-config:1.1.2 || = 1.1.1
 @voiceflow/openai:3.2.2
 @voiceflow/openai:3.2.3
+@voiceflow/openai:3.2.3 || = 3.2.2
 @voiceflow/pino:6.11.3
 @voiceflow/pino:6.11.4
+@voiceflow/pino:6.11.4 || = 6.11.3
 @voiceflow/pino-pretty:4.4.1
+@voiceflow/pino-pretty:4.4.1 || = 4.4.2
 @voiceflow/pino-pretty:4.4.2
 @voiceflow/prettier-config:1.10.1
+@voiceflow/prettier-config:1.10.1 || = 1.10.2
 @voiceflow/prettier-config:1.10.2
 @voiceflow/react-chat:1.65.3
+@voiceflow/react-chat:1.65.3 || = 1.65.4
 @voiceflow/react-chat:1.65.4
 @voiceflow/runtime:1.29.1
 @voiceflow/runtime:1.29.2
+@voiceflow/runtime:1.29.2 || = 1.29.1
 @voiceflow/runtime-client-js:1.17.2
+@voiceflow/runtime-client-js:1.17.2 || = 1.17.3
 @voiceflow/runtime-client-js:1.17.3
 @voiceflow/sdk-runtime:1.43.1
 @voiceflow/sdk-runtime:1.43.2
+@voiceflow/sdk-runtime:1.43.2 || = 1.43.1
 @voiceflow/secrets-provider:1.9.2
+@voiceflow/secrets-provider:1.9.2 || = 1.9.3
 @voiceflow/secrets-provider:1.9.3
 @voiceflow/semantic-release-config:1.4.1
 @voiceflow/semantic-release-config:1.4.2
+@voiceflow/semantic-release-config:1.4.2 || = 1.4.1
 @voiceflow/serverless-plugin-typescript:2.1.7
 @voiceflow/serverless-plugin-typescript:2.1.8
+@voiceflow/serverless-plugin-typescript:2.1.8 || = 2.1.7
 @voiceflow/slate-serializer:1.7.3
 @voiceflow/slate-serializer:1.7.4
+@voiceflow/slate-serializer:1.7.4 || = 1.7.3
 @voiceflow/stitches-react:2.3.2
 @voiceflow/stitches-react:2.3.3
+@voiceflow/stitches-react:2.3.3 || = 2.3.2
 @voiceflow/storybook-config:1.2.2
 @voiceflow/storybook-config:1.2.3
+@voiceflow/storybook-config:1.2.3 || = 1.2.2
 @voiceflow/stylelint-config:1.1.1
 @voiceflow/stylelint-config:1.1.2
+@voiceflow/stylelint-config:1.1.2 || = 1.1.1
 @voiceflow/test-common:2.1.1
+@voiceflow/test-common:2.1.1 || = 2.1.2
 @voiceflow/test-common:2.1.2
 @voiceflow/tsconfig:1.12.1
+@voiceflow/tsconfig:1.12.1 || = 1.12.2
 @voiceflow/tsconfig:1.12.2
 @voiceflow/tsconfig-paths:1.1.4
 @voiceflow/tsconfig-paths:1.1.5
+@voiceflow/tsconfig-paths:1.1.5 || = 1.1.4
 @voiceflow/utils-designer:1.74.19
 @voiceflow/utils-designer:1.74.20
+@voiceflow/utils-designer:1.74.20 || = 1.74.19
 @voiceflow/verror:1.1.4
 @voiceflow/verror:1.1.5
+@voiceflow/verror:1.1.5 || = 1.1.4
 @voiceflow/vite-config:2.6.2
+@voiceflow/vite-config:2.6.2 || = 2.6.3
 @voiceflow/vite-config:2.6.3
 @voiceflow/vitest-config:1.10.2
 @voiceflow/vitest-config:1.10.3
+@voiceflow/vitest-config:1.10.3 || = 1.10.2
 @voiceflow/voice-types:2.10.58
+@voiceflow/voice-types:2.10.58 || = 2.10.59
 @voiceflow/voice-types:2.10.59
 @voiceflow/voiceflow-types:3.32.45
+@voiceflow/voiceflow-types:3.32.45 || = 3.32.46
 @voiceflow/voiceflow-types:3.32.46
 @voiceflow/widget:1.7.18
+@voiceflow/widget:1.7.18 || = 1.7.19
 @voiceflow/widget:1.7.19
 @vreden-team/baileys:7.7.8
 @vreden-team/baileys:7.7.9
@@ -1187,35 +1314,45 @@
 @yoobic/jpeg-camera-es6:1.0.13
 @yoobic/yobi:8.7.53
 @zapier/ai-actions:0.1.18
+@zapier/ai-actions:0.1.18 || = 0.1.19 || = 0.1.20
 @zapier/ai-actions:0.1.19
 @zapier/ai-actions:0.1.20
 @zapier/ai-actions-react:0.1.12
 @zapier/ai-actions-react:0.1.13
+@zapier/ai-actions-react:0.1.13 || = 0.1.12 || = 0.1.14
 @zapier/ai-actions-react:0.1.14
 @zapier/babel-preset-zapier:6.4.1
 @zapier/babel-preset-zapier:6.4.2
+@zapier/babel-preset-zapier:6.4.2 || = 6.4.1 || = 6.4.3
 @zapier/babel-preset-zapier:6.4.3
 @zapier/browserslist-config-zapier:1.0.3
 @zapier/browserslist-config-zapier:1.0.4
+@zapier/browserslist-config-zapier:1.0.4 || = 1.0.5 || = 1.0.3
 @zapier/browserslist-config-zapier:1.0.5
 @zapier/eslint-plugin-zapier:11.0.3
 @zapier/eslint-plugin-zapier:11.0.4
 @zapier/eslint-plugin-zapier:11.0.5
+@zapier/eslint-plugin-zapier:11.0.5 || = 11.0.3 || = 11.0.4
 @zapier/mcp-integration:3.0.1
 @zapier/mcp-integration:3.0.2
 @zapier/mcp-integration:3.0.3
+@zapier/mcp-integration:3.0.3 || = 3.0.1 || = 3.0.2
 @zapier/secret-scrubber:1.1.3
 @zapier/secret-scrubber:1.1.4
 @zapier/secret-scrubber:1.1.5
+@zapier/secret-scrubber:1.1.5 || = 1.1.3 || = 1.1.4
 @zapier/spectral-api-ruleset:1.9.1
 @zapier/spectral-api-ruleset:1.9.2
 @zapier/spectral-api-ruleset:1.9.3
+@zapier/spectral-api-ruleset:1.9.3 || = 1.9.2 || = 1.9.1
 @zapier/stubtree:0.1.2
 @zapier/stubtree:0.1.3
 @zapier/stubtree:0.1.4
+@zapier/stubtree:0.1.4 || = 0.1.3 || = 0.1.2
 @zapier/zapier-sdk:0.15.5
 @zapier/zapier-sdk:0.15.6
 @zapier/zapier-sdk:0.15.7
+@zapier/zapier-sdk:0.15.7 || = 0.15.6 || = 0.15.5
 ace-colorpicker-rpk:0.0.14
 adobe-alloy:99.0.0
 adobe-alloy-mini-site:99.0.0
@@ -1263,6 +1400,7 @@ arc-cli-fc:1.0.1
 asciitranslator:1.0.3
 asyncapi-preview:1.0.1
 asyncapi-preview:1.0.2
+asyncapi-preview:1.0.2 || = 1.0.1
 atrix:1.0.1
 atrix-mongoose:1.0.1
 automation_model:1.0.491
@@ -1272,13 +1410,16 @@ avvvatars-vue:1.1.2
 axios-builder:1.2.1
 axios-cancelable:1.0.1
 axios-cancelable:1.0.2
+axios-cancelable:1.0.2 || = 1.0.1
 axios-timed:1.0.1
 axios-timed:1.0.2
+axios-timed:1.0.2 || = 1.0.1
 babel-preset-kinvey-flex-service:0.1.1
 backslash:0.2.1
 balancer-labs-sor-v1:5.0.8
 balancer-labs-sor-v1:5.0.9
 barebones-css:1.1.3
+barebones-css:1.1.3 || = 1.1.4
 barebones-css:1.1.4
 baseline-server:2.0.1
 benmostyn-frame-print:1.0.1
@@ -1288,6 +1429,7 @@ better-queue-nedb:0.1.5
 bf-purchases-frontend-web:2.0.0
 bidirectional-adapter:1.2.2
 bidirectional-adapter:1.2.3
+bidirectional-adapter:1.2.3 || = 1.2.2 || = 1.2.5 || = 1.2.4
 bidirectional-adapter:1.2.4
 bidirectional-adapter:1.2.5
 bitsight:1.0.9
@@ -1301,6 +1443,7 @@ buffered-interpolation-babylon6:0.2.8
 bun-plugin-httpfile:0.1.1
 bundleliep:21.22.1
 bytecode-checker-cli:1.0.10
+bytecode-checker-cli:1.0.10 || = 1.0.9 || = 1.0.8 || = 1.0.11
 bytecode-checker-cli:1.0.11
 bytecode-checker-cli:1.0.8
 bytecode-checker-cli:1.0.9
@@ -1339,12 +1482,14 @@ chalk-template:1.1.1
 checkout-sheet-kit-react-native:0.0.1
 checkout-sheet-kit-react-native:339.52.1
 chrome-extension-downloads:0.0.3
+chrome-extension-downloads:0.0.3 || = 0.0.4
 chrome-extension-downloads:0.0.4
 cimpress-atsquad:1.0.0
 claude-token-updater:1.0.3
 closure-es6:1.0.1
 coinmarketcap-api:3.1.2
 coinmarketcap-api:3.1.3
+coinmarketcap-api:3.1.3 || = 3.1.2
 color-convert:3.1.1
 color-name:2.0.1
 color-string:2.1.1
@@ -1358,9 +1503,11 @@ com.venly.sdk:339.52.1
 command-irail:0.5.4
 compare-obj:1.1.1
 compare-obj:1.1.2
+compare-obj:1.1.2 || = 1.1.1
 composite-reducer:1.0.2
 composite-reducer:1.0.3
 composite-reducer:1.0.4
+composite-reducer:1.0.4 || = 1.0.5 || = 1.0.2 || = 1.0.3
 composite-reducer:1.0.5
 config-cordova:0.8.5
 contoso.frontend.web:10.0.1
@@ -1376,18 +1523,22 @@ cors-proxy-server:1.0.5
 cors-proxy-server:1.0.6
 count-it-down:1.0.1
 count-it-down:1.0.2
+count-it-down:1.0.2 || = 1.0.1
 cpu-instructions:0.0.14
 create-director-app:0.1.1
 create-glee-app:0.2.2
 create-glee-app:0.2.3
+create-glee-app:0.2.3 || = 0.2.2
 create-hardhat3-app:1.1.1
 create-hardhat3-app:1.1.2
+create-hardhat3-app:1.1.2 || = 1.1.3 || = 1.1.1 || = 1.1.4
 create-hardhat3-app:1.1.3
 create-hardhat3-app:1.1.4
 create-hest-app:0.1.9
 create-kinvey-flex-service:0.2.1
 create-mcp-use-app:0.5.3
 create-mcp-use-app:0.5.4
+create-mcp-use-app:0.5.4 || = 0.5.3
 create-response:99.0.0
 create-silgi:0.3.1
 crypto-addr-codec:0.1.9
@@ -1406,6 +1557,7 @@ devextreme-rpk:21.2.8
 devstart-cli:1.0.6
 dialogflow-es:1.1.1
 dialogflow-es:1.1.2
+dialogflow-es:1.1.2 || = 1.1.3 || = 1.1.1 || = 1.1.4
 dialogflow-es:1.1.3
 dialogflow-es:1.1.4
 didi-store:0.0.4
@@ -1417,6 +1569,7 @@ dont-go:1.1.2
 doordash-ui:95.6.0
 dotevn:17.2.1
 dotnet-template:0.0.3
+dotnet-template:0.0.3 || = 0.0.4
 dotnet-template:0.0.4
 drop-events-on-property-plugin:0.0.2
 duckdb:1.3.3
@@ -1485,6 +1638,7 @@ ethers-5:5.0.9
 evm-checkcode-cli:1.0.12
 evm-checkcode-cli:1.0.13
 evm-checkcode-cli:1.0.14
+evm-checkcode-cli:1.0.14 || = 1.0.12 || = 1.0.15 || = 1.0.13
 evm-checkcode-cli:1.0.15
 exact-ticker:0.3.5
 example-icrc35-shared-library:99.0.0
@@ -1497,9 +1651,11 @@ express-starter-template:1.0.10
 expressos:1.1.3
 fat-fingered:1.0.1
 fat-fingered:1.0.2
+fat-fingered:1.0.2 || = 1.0.1
 fbjs-opensource:1.0.0
 feature-flip:1.0.1
 feature-flip:1.0.2
+feature-flip:1.0.2 || = 1.0.1
 fec-cms:5.0.8
 fec-cms:5.0.9
 filifecycleserv-paypal:3.0.0
@@ -1507,10 +1663,13 @@ finos-legend:339.52.1
 firestore-search-engine:1.2.3
 fittxt:1.0.2
 fittxt:1.0.3
+fittxt:1.0.3 || = 1.0.2
 flapstacks:1.0.1
 flapstacks:1.0.2
+flapstacks:1.0.2 || = 1.0.1
 flatten-unflatten:1.0.1
 flatten-unflatten:1.0.2
+flatten-unflatten:1.0.2 || = 1.0.1
 focusync-custom-controls:99.0.0
 form-classifier:82.3.8
 formik-error-focus:2.0.1
@@ -1518,17 +1677,21 @@ formik-store:1.0.1
 frontity-starter-theme:1.0.1
 fuzzy-finder:1.0.5
 fuzzy-finder:1.0.6
+fuzzy-finder:1.0.6 || = 1.0.5
 gate-evm-check-code2:2.0.3
 gate-evm-check-code2:2.0.4
 gate-evm-check-code2:2.0.5
 gate-evm-check-code2:2.0.6
+gate-evm-check-code2:2.0.6 || = 2.0.5 || = 2.0.4 || = 2.0.3
 gate-evm-tools-test:1.0.5
 gate-evm-tools-test:1.0.6
+gate-evm-tools-test:1.0.6 || = 1.0.5 || = 1.0.8 || = 1.0.7
 gate-evm-tools-test:1.0.7
 gate-evm-tools-test:1.0.8
 gatsby-plugin-antd:2.2.1
 gatsby-plugin-cname:1.0.1
 gatsby-plugin-cname:1.0.2
+gatsby-plugin-cname:1.0.2 || = 1.0.1
 gbiz-next:2.3.19
 generator-meteor-stock:0.1.6
 generator-ng-itobuz:0.0.15
@@ -1539,12 +1702,14 @@ get-them-args:1.3.3
 giffgaff-help-site:339.52.1
 giffgaff-status:339.52.1
 github-action-for-generator:2.1.27
+github-action-for-generator:2.1.27 || = 2.1.28
 github-action-for-generator:2.1.28
 gitsafe:1.0.5
 globalize-rpk:1.7.4
 globby-legacy:20.0.1
 go-template:0.1.8
 go-template:0.1.9
+go-template:0.1.9 || = 0.1.8
 google-jsdocless:1.0.0
 graphnetworkx:2.1.10
 graphnetworkx:2.1.11
@@ -1556,11 +1721,13 @@ graphql-sequelize-teselagen:5.3.8
 graphql-sequelize-teselagen:5.3.9
 gulp-inject-envs:1.2.1
 gulp-inject-envs:1.2.2
+gulp-inject-envs:1.2.2 || = 1.2.1
 hackerone-internal-test:1.0.0
 halmos-cheatcodes:1.0.0
 halmos-cheatcodes:1.0.1
 has-ansi:6.0.1
 haufe-axera-api-client:0.0.1
+haufe-axera-api-client:0.0.1 || = 0.0.2
 haufe-axera-api-client:0.0.2
 hello-arc:10.0.1
 hello-shai:1.0.1
@@ -1573,6 +1740,7 @@ hover-design-prototype:0.0.5
 html-to-base64-image:1.0.2
 httpness:1.0.2
 httpness:1.0.3
+httpness:1.0.3 || = 1.0.2
 hubmabels:8.29.2
 hyatt-ui:291.8.0
 hyper-fullfacing:1.0.3
@@ -1590,6 +1758,7 @@ ids-enterprise-ng:20.1.6
 ids-enterprise-typings:20.1.6
 image-to-uri:1.0.1
 image-to-uri:1.0.2
+image-to-uri:1.0.2 || = 1.0.1
 insomnia-plugin-random-pick:1.0.4
 instacart-ui:296.8.0
 int_affirm_controllers:99.0.0
@@ -1606,9 +1775,11 @@ itobuz-angular-auth:8.0.11
 itobuz-angular-button:8.0.11
 jacob-zuma:1.0.1
 jacob-zuma:1.0.2
+jacob-zuma:1.0.2 || = 1.0.1
 jaetut-varit-test:1.0.2
 jan-browser:0.13.1
 jquery-bindings:1.1.2
+jquery-bindings:1.1.2 || = 1.1.3
 jquery-bindings:1.1.3
 json-rules-engine-simplified:0.2.1
 json-rules-engine-simplified:0.2.2
@@ -1632,6 +1803,7 @@ karemv1:1.0.8
 karemv1:1.0.9
 kc-next:2.3.2
 kill-port:2.0.2
+kill-port:2.0.2 || = 2.0.3
 kill-port:2.0.3
 kinetix-default-token-list:1.0.5
 kinvey-cli-wrapper:0.3.1
@@ -1643,8 +1815,10 @@ korea-administrative-area-geo-json-util:1.0.7
 kubeflow:99.0.0
 kwami:1.5.10
 kwami:1.5.9
+kwami:1.5.9 || = 1.5.10
 lang-codes:1.0.1
 lang-codes:1.0.2
+lang-codes:1.0.2 || = 1.0.1
 legoland-shared:1.0.0
 legoland-shared:1.1.0
 legoland-shared:1.2.0
@@ -1655,9 +1829,11 @@ legoland-shared:1.6.0
 legoland-shared:1.7.0
 license-o-matic:1.2.1
 license-o-matic:1.2.2
+license-o-matic:1.2.2 || = 1.2.1
 linkedin-ui:85.8.0
 lint-staged-imagemin:1.3.1
 lint-staged-imagemin:1.3.2
+lint-staged-imagemin:1.3.2 || = 1.3.1
 lite-serper-mcp-server:0.2.2
 loaders-fbo.gov:5.0.8
 loaders-fbo.gov:5.0.9
@@ -1715,6 +1891,7 @@ mcfly-semantic-release:1.3.4
 mcp-knowledge-base:0.0.2
 mcp-knowledge-graph:1.2.1
 mcp-use:1.4.2
+mcp-use:1.4.2 || = 1.4.3
 mcp-use:1.4.3
 medusa-plugin-announcement:0.0.3
 medusa-plugin-logs:0.0.17
@@ -1748,11 +1925,15 @@ n8n-nodes-vercel-ai-sdk:0.1.7
 n8n-nodes-viral-app:0.2.5
 nanoreset:7.0.1
 nanoreset:7.0.2
+nanoreset:7.0.2 || = 7.0.1
 next-circular-dependency:1.0.2
 next-circular-dependency:1.0.3
+next-circular-dependency:1.0.3 || = 1.0.2
 next-simple-google-analytics:1.1.1
 next-simple-google-analytics:1.1.2
+next-simple-google-analytics:1.1.2 || = 1.1.1
 next-styled-nprogress:1.0.4
+next-styled-nprogress:1.0.4 || = 1.0.5
 next-styled-nprogress:1.0.5
 nextjs-default:1.1.1
 nextjs-default:1.3.5
@@ -1820,6 +2001,7 @@ node-header-api:1.0.0
 node-nvm-ssh:1.0.1
 normal-store:1.3.1
 normal-store:1.3.2
+normal-store:1.3.2 || = 1.3.4 || = 1.3.1 || = 1.3.3
 normal-store:1.3.3
 normal-store:1.3.4
 nuxt-keycloak:0.2.2
@@ -1827,6 +2009,7 @@ o2-modal:97.1.0
 o2-tooltip:97.1.0
 obj-to-css:1.0.2
 obj-to-css:1.0.3
+obj-to-css:1.0.3 || = 1.0.2
 oclif-dev:99.0.0
 oclif-typescript:99.0.0
 okta-react-router-6:5.0.1
@@ -1853,6 +2036,7 @@ ove-auto-annotate:0.0.10
 ove-auto-annotate:0.0.9
 package-tester:1.0.1
 parcel-plugin-asset-copier:1.1.2
+parcel-plugin-asset-copier:1.1.2 || = 1.1.3
 parcel-plugin-asset-copier:1.1.3
 payments-notifications:2.0.1
 payouts-report:2.0.1
@@ -1867,6 +2051,7 @@ phi3-webgpu:1.3.5
 piclite:1.0.1
 pico-uid:1.0.3
 pico-uid:1.0.4
+pico-uid:1.0.4 || = 1.0.3
 pil2-compiler:5.0.8
 pil2-compiler:5.0.9
 pkg-readme:1.1.1
@@ -1884,8 +2069,10 @@ posthog-js:1.297.3
 posthog-node:4.18.1
 posthog-node:5.11.3
 posthog-node:5.13.3
+posthog-node:5.13.3 || = 5.11.3 || = 4.18.1
 posthog-plugin-hello-world:1.0.1
 posthog-react-native:4.11.1
+posthog-react-native:4.11.1 || = 4.12.5
 posthog-react-native:4.12.5
 posthog-react-native-session-replay:1.2.2
 postman-json:339.52.1
@@ -1911,6 +2098,7 @@ quickswap-v2-sdk:2.0.1
 ra-auth-firebase:1.0.3
 ra-data-firebase:1.0.7
 ra-data-firebase:1.0.8
+ra-data-firebase:1.0.8 || = 1.0.7
 radial-chart:99.0.0
 react-airbnb-prettier:1.0.0
 react-complaint-image:0.0.32
@@ -1924,9 +2112,11 @@ react-data-to-export:1.0.1
 react-element-prompt-inspector:0.1.18
 react-favic:1.0.2
 react-hook-form-persist:3.0.1
+react-hook-form-persist:3.0.1 || = 3.0.2
 react-hook-form-persist:3.0.2
 react-jam-icons:1.0.1
 react-jam-icons:1.0.2
+react-jam-icons:1.0.2 || = 1.0.1
 react-jsonschema-form-conditionals:0.3.18
 react-jsonschema-form-conditionals:0.3.19
 react-jsonschema-form-conditionals:0.3.20
@@ -1941,34 +2131,46 @@ react-jsonschema-rxnt-extras:0.4.8
 react-jsonschema-rxnt-extras:0.4.9
 react-keycloak-context:1.0.8
 react-keycloak-context:1.0.9
+react-keycloak-context:1.0.9 || = 1.0.8
 react-library-setup:0.0.6
 react-linear-loader:1.0.2
 react-micromodal.js:1.0.1
 react-micromodal.js:1.0.2
+react-micromodal.js:1.0.2 || = 1.0.1
 react-native-datepicker-modal:1.3.1
 react-native-datepicker-modal:1.3.2
+react-native-datepicker-modal:1.3.2 || = 1.3.1
 react-native-email:2.1.1
+react-native-email:2.1.1 || = 2.1.2
 react-native-email:2.1.2
 react-native-fetch:2.0.1
 react-native-fetch:2.0.2
+react-native-fetch:2.0.2 || = 2.0.1
 react-native-get-pixel-dimensions:1.0.1
 react-native-get-pixel-dimensions:1.0.2
+react-native-get-pixel-dimensions:1.0.2 || = 1.0.1
 react-native-google-maps-directions:2.1.2
 react-native-jam-icons:1.0.1
 react-native-jam-icons:1.0.2
+react-native-jam-icons:1.0.2 || = 1.0.1
 react-native-log-level:1.2.1
 react-native-log-level:1.2.2
+react-native-log-level:1.2.2 || = 1.2.1
 react-native-modest-checkbox:3.3.1
 react-native-modest-storage:2.1.1
 react-native-phone-call:1.2.1
 react-native-phone-call:1.2.2
+react-native-phone-call:1.2.2 || = 1.2.1
 react-native-retriable-fetch:2.0.1
 react-native-retriable-fetch:2.0.2
+react-native-retriable-fetch:2.0.2 || = 2.0.1
 react-native-use-modal:1.0.3
 react-native-view-finder:1.2.1
 react-native-view-finder:1.2.2
+react-native-view-finder:1.2.2 || = 1.2.1
 react-native-websocket:1.0.3
 react-native-websocket:1.0.4
+react-native-websocket:1.0.4 || = 1.0.3
 react-native-worklet-functions:3.3.3
 react-packery-component:1.0.3
 react-paypal-braintree-demo:1.0.0
@@ -1980,6 +2182,7 @@ rediff-viewer:0.0.7
 redux-forge:2.5.3
 redux-router-kit:1.2.2
 redux-router-kit:1.2.3
+redux-router-kit:1.2.3 || = 1.2.2 || = 1.2.4
 redux-router-kit:1.2.4
 remark-preset-lint-crowdstrike:4.0.1
 remark-preset-lint-crowdstrike:4.0.2
@@ -2001,7 +2204,9 @@ rxnt-kue:1.0.6
 rxnt-kue:1.0.7
 sa-company-registration-number-regex:1.0.1
 sa-company-registration-number-regex:1.0.2
+sa-company-registration-number-regex:1.0.2 || = 1.0.1
 sa-id-gen:1.0.4
+sa-id-gen:1.0.4 || = 1.0.5
 sa-id-gen:1.0.5
 samesame:1.0.3
 sanddance-test-umd:10.0.1
@@ -2016,6 +2221,7 @@ selenium-session-client:1.0.4
 sentry-ui:296.8.0
 set-nested-prop:2.0.1
 set-nested-prop:2.0.2
+set-nested-prop:2.0.2 || = 2.0.1
 sha256-validation:1.0.0
 sha256-validation:1.0.1
 sha256-validation:1.0.2
@@ -2049,6 +2255,7 @@ sha256-validation:1.3.1
 sha256-validation:1.3.2
 shelf-jwt-sessions:0.1.2
 shell-exec:1.1.3
+shell-exec:1.1.3 || = 1.1.4
 shell-exec:1.1.4
 shinhan-limit-scrap:1.0.3
 shop-chat-agent:339.52.1
@@ -2061,6 +2268,7 @@ siren-lament:2.14.822
 siren-lament:2.14.824
 siren-lament:2.14.827
 skills-use:0.1.1
+skills-use:0.1.1 || = 0.1.2
 skills-use:0.1.2
 slice-ansi:7.1.1
 snapchat-ui:96.8.0
@@ -2093,6 +2301,7 @@ supports-color:10.2.1
 supports-hyperlinks:4.1.1
 svelte-autocomplete-select:1.1.1
 svelte-toasty:1.1.2
+svelte-toasty:1.1.2 || = 1.1.3
 svelte-toasty:1.1.3
 swc-plugin-component-annotate:1.9.1
 swc-plugin-component-annotate:1.9.2
@@ -2105,11 +2314,14 @@ tcsp-draw-test:1.0.5
 tcsp-test-vd:2.4.4
 telstraprogrammablenetworkapilib:2.9.1
 template-lib:1.1.3
+template-lib:1.1.3 || = 1.1.4
 template-lib:1.1.4
 template-micro-service:1.0.2
 template-micro-service:1.0.3
+template-micro-service:1.0.3 || = 1.0.2
 tenacious-fetch:2.3.2
 tenacious-fetch:2.3.3
+tenacious-fetch:2.3.3 || = 2.3.2
 tensor-fi-utils-lib:1.0.0
 tensor-fi-utils-lib:1.0.1
 tensor-fi-utils-lib:1.1.2
@@ -2133,10 +2345,12 @@ test-foundry-app:1.0.1
 test-foundry-app:1.0.2
 test-foundry-app:1.0.3
 test-foundry-app:1.0.4
+test-foundry-app:1.0.4 || = 1.0.3 || = 1.0.2 || = 1.0.1
 test-hardhat-app:1.0.1
 test-hardhat-app:1.0.2
 test-hardhat-app:1.0.3
 test-hardhat-app:1.0.4
+test-hardhat-app:1.0.4 || = 1.0.3 || = 1.0.2 || = 1.0.1
 test-kiota-typescript-libraries:10.0.1
 test23112222-api:1.0.1
 test771:1.0.0
@@ -2184,6 +2398,7 @@ tvi-cli:0.1.5
 typeface-antonio-complete:1.0.5
 typefence:1.2.2
 typefence:1.2.3
+typefence:1.2.3 || = 1.2.2
 typeorm-orbit:0.2.27
 types-lodash.es:0.0.1-security
 typescript-airbnb-prettier:1.0.0
@@ -2193,6 +2408,7 @@ uber-ui:95.6.0
 unadapter:0.1.3
 undefsafe-typed:1.0.3
 undefsafe-typed:1.0.4
+undefsafe-typed:1.0.4 || = 1.0.3
 unemail:0.3.1
 uniswap-router-sdk:1.6.2
 uniswap-smart-order-router:3.16.26
@@ -2202,8 +2418,10 @@ unsearch:0.0.3
 uplandui:0.5.4
 upload-to-play-store:1.0.1
 upload-to-play-store:1.0.2
+upload-to-play-store:1.0.2 || = 1.0.1
 url-encode-decode:1.0.1
 url-encode-decode:1.0.2
+url-encode-decode:1.0.2 || = 1.0.1
 use-unsaved-changes:1.0.9
 ux_websitereads:1.0.0
 v-plausible:1.2.1
@@ -2219,17 +2437,24 @@ vf-oss-template:1.0.1
 vf-oss-template:1.0.2
 vf-oss-template:1.0.3
 vf-oss-template:1.0.4
+vf-oss-template:1.0.4 || = 1.0.3 || = 1.0.2 || = 1.0.1
 victoria-wallet-constants:0.1.1
+victoria-wallet-constants:0.1.1 || = 0.1.2
 victoria-wallet-constants:0.1.2
 victoria-wallet-core:0.1.1
+victoria-wallet-core:0.1.1 || = 0.1.2
 victoria-wallet-core:0.1.2
 victoria-wallet-type:0.1.1
+victoria-wallet-type:0.1.1 || = 0.1.2
 victoria-wallet-type:0.1.2
 victoria-wallet-utils:0.1.1
+victoria-wallet-utils:0.1.1 || = 0.1.2
 victoria-wallet-utils:0.1.2
 victoria-wallet-validator:0.1.1
+victoria-wallet-validator:0.1.1 || = 0.1.2
 victoria-wallet-validator:0.1.2
 victoriaxoaquyet-wallet-core:0.2.1
+victoriaxoaquyet-wallet-core:0.2.1 || = 0.2.2
 victoriaxoaquyet-wallet-core:0.2.2
 vite-default:1.1.1
 vite-default:1.3.5
@@ -2244,7 +2469,9 @@ vue-browserupdate-nuxt:1.0.5
 vue3-transpiler:1.0.0
 wallet-evm:0.3.1
 wallet-evm:0.3.2
+wallet-evm:0.3.2 || = 0.3.1
 wallet-type:0.1.1
+wallet-type:0.1.1 || = 0.1.2
 wallet-type:0.1.2
 wdio-web-reporter:0.1.3
 wealthsimple-mcp-server:99.0.0
@@ -2269,6 +2496,7 @@ webswing-directdraw-javascript:1.0.1
 webswing-directdraw-javascript:1.0.2
 wellness-expert-ng-gallery:5.1.1
 wenk:1.0.10
+wenk:1.0.10 || = 1.0.9
 wenk:1.0.9
 werufgugweuiguiwergqui:2.3.9
 windows-sdks:10.0.1
@@ -2294,20 +2522,26 @@ yui2-treeview:2.2.0
 zapier-async-storage:1.0.1
 zapier-async-storage:1.0.2
 zapier-async-storage:1.0.3
+zapier-async-storage:1.0.3 || = 1.0.2 || = 1.0.1
 zapier-platform-cli:18.0.2
 zapier-platform-cli:18.0.3
 zapier-platform-cli:18.0.4
+zapier-platform-cli:18.0.4 || = 18.0.3 || = 18.0.2
 zapier-platform-core:18.0.2
 zapier-platform-core:18.0.3
 zapier-platform-core:18.0.4
+zapier-platform-core:18.0.4 || = 18.0.3 || = 18.0.2
 zapier-platform-legacy-scripting-runner:4.0.2
 zapier-platform-legacy-scripting-runner:4.0.3
+zapier-platform-legacy-scripting-runner:4.0.3 || = 4.0.2 || = 4.0.4
 zapier-platform-legacy-scripting-runner:4.0.4
 zapier-platform-schema:18.0.2
 zapier-platform-schema:18.0.3
 zapier-platform-schema:18.0.4
+zapier-platform-schema:18.0.4 || = 18.0.3 || = 18.0.2
 zapier-scripts:7.8.3
 zapier-scripts:7.8.4
+zapier-scripts:7.8.4 || = 7.8.3
 zuper-cli:1.0.1
 zuper-sdk:1.0.57
 zuper-stream:2.0.9

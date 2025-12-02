@@ -49,37 +49,10 @@ FEEDS = {
         "description": "Cobenian's package list",
     },
     "cyberDracula_wiz": {
-        "url": "https://raw.githubusercontent.com/CyberDracula/shai-hulud-2-scanner/main/fallback/wiz-research-data.json",
+        "url": "https://raw.githubusercontent.com/CyberDracula/shai-hulud-2-scanner/main/fallback/wiz-iocs.csv",
         "target": "compromised-packages.txt",
-        "parser": "json_packages",
-        "description": "Wiz.io research data",
-    },
-    
-    # -------------------------------------------------------------------------
-    # MALICIOUS HASHES
-    # -------------------------------------------------------------------------
-    "cyberDracula_hashes": {
-        "url": "https://raw.githubusercontent.com/CyberDracula/shai-hulud-2-scanner/main/fallback/known-hashes.json",
-        "target": "malicious-hashes.txt",
-        "parser": "json_hashes",
-        "description": "CyberDracula's hash database",
-        "optional": True,  # May not exist
-    },
-    
-    # -------------------------------------------------------------------------
-    # EXFILTRATION ENDPOINTS  
-    # -------------------------------------------------------------------------
-    # Note: We curate these manually as external feeds tend to be noisy
-    
-    # -------------------------------------------------------------------------
-    # SUSPICIOUS NAMESPACES
-    # -------------------------------------------------------------------------
-    "cyberDracula_namespaces": {
-        "url": "https://raw.githubusercontent.com/CyberDracula/shai-hulud-2-scanner/main/fallback/targeted-namespaces.json",
-        "target": "suspicious-namespaces.txt",
-        "parser": "json_list",
-        "description": "CyberDracula's targeted namespaces",
-        "optional": True,
+        "parser": "csv_packages",
+        "description": "Wiz.io IOC data via CyberDracula",
     },
 }
 
@@ -215,6 +188,11 @@ def parse_csv_packages(content: str) -> set:
         if len(parts) >= 2:
             pkg_name = parts[0].strip().strip('"')
             version = parts[1].strip().strip('"')
+            # Handle "= 1.0.0" format from wiz-iocs.csv
+            if version.startswith("= "):
+                version = version[2:]
+            elif version.startswith("="):
+                version = version[1:]
             if pkg_name and version:
                 packages.add(f"{pkg_name}:{version}")
     return packages
