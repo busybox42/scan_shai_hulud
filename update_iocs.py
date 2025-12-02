@@ -14,7 +14,7 @@ import os
 import sys
 import urllib.request
 import urllib.error
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 # IOC Feed URLs - checked and verified working endpoints
@@ -64,13 +64,18 @@ def parse_json_feed(content: str) -> set:
                 elif isinstance(item, str) and ":" in item:
                     packages.add(item)
         elif isinstance(data, dict):
-            # Handle {package: [versions]} format
-            for pkg_name, versions in data.items():
-                if isinstance(versions, list):
-                    for v in versions:
+            for pkg_name, pkg_data in data.items():
+                # Handle {package: {versions: [...]}} format (CyberDracula)
+                if isinstance(pkg_data, dict) and "versions" in pkg_data:
+                    for v in pkg_data["versions"]:
                         packages.add(f"{pkg_name}:{v}")
-                elif isinstance(versions, str):
-                    packages.add(f"{pkg_name}:{versions}")
+                # Handle {package: [versions]} format
+                elif isinstance(pkg_data, list):
+                    for v in pkg_data:
+                        packages.add(f"{pkg_name}:{v}")
+                # Handle {package: version} format
+                elif isinstance(pkg_data, str):
+                    packages.add(f"{pkg_name}:{pkg_data}")
     except json.JSONDecodeError as e:
         print(f"  [!] JSON parse error: {e}", file=sys.stderr)
     return packages
@@ -138,7 +143,7 @@ def save_packages(packages: set, header_lines: list):
             f.write(line + "\n")
         
         # Add update timestamp if not in header
-        timestamp_line = f"# Last updated: {datetime.utcnow().isoformat()}Z"
+        timestamp_line = f"# Last updated: {datetime.now(timezone.utc).isoformat()}"
         if not any("Last updated" in h for h in header_lines):
             f.write("\n" + timestamp_line + "\n")
         
