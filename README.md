@@ -232,6 +232,7 @@ If the scanner finds **High/Critical** severity issues:
 **Detection Tools:**
 - [Cobenian/shai-hulud-detect](https://github.com/Cobenian/shai-hulud-detect) - Bash-based detector (1677+ packages)
 - [gensecaihq/Shai-Hulud-2.0-Detector](https://github.com/gensecaihq/Shai-Hulud-2.0-Detector) - GitHub Action with SARIF support
+- [CyberDracula/shai-hulud-2-scanner](https://github.com/CyberDracula/shai-hulud-2-scanner) - Node.js forensic tool (behavioral heuristics)
 
 **Additional Resources:**
 - [Kaspersky Securelist: Shai-Hulud Worm Analysis](https://securelist.com/shai-hulud-worm-infects-500-npm-packages-in-a-supply-chain-attack/)
