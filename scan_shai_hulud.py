@@ -62,6 +62,12 @@ IOC_WORKFLOW_PATHS = {
     ".github/workflows/auto-publish.yaml",
 }
 
+# Workflow filename patterns (regex) for dynamic matching
+IOC_WORKFLOW_PATTERNS = [
+    r"formatter_\d+\.yml$",  # formatter_*.yml - Shai-Hulud 2.0 pattern
+    r"formatter_\d+\.yaml$",
+]
+
 # Repo / description markers
 IOC_STRINGS = {
     "Shai-Hulud",
@@ -92,6 +98,7 @@ IOC_DOMAINS = {
 # webhook.site is the PRIMARY exfil endpoint for Shai-Hulud
 IOC_EXFIL_ENDPOINTS = {
     "webhook.site",  # PRIMARY - Shai-Hulud exfil endpoint
+    "bb8ca5f6-4175-45d2-b042-fc9ebb8170b7",  # Known malicious webhook.site UUID
     "discord.com/api/webhooks",
     "api.telegram.org",
     "hooks.slack.com",
@@ -108,6 +115,13 @@ IOC_EXFIL_ENDPOINTS = {
     "0x0.st",
     "transfer.sh",
     "file.io",
+}
+
+# SHA1 hashes for known malicious Shai-Hulud 2.0 files
+# Source: gensecaihq/Shai-Hulud-2.0-Detector
+MALICIOUS_SHA1_HASHES = {
+    "d60ec97eea19fffb4809bc35b91033b52490ca11": "bun_environment.js",
+    "d1829b4708126dcc7bea7437c04d1f10eacd4a16": "setup_bun.js",
 }
 
 # Known attacker cryptocurrency wallet addresses
@@ -130,6 +144,7 @@ SUSPICIOUS_SCRIPT_PATTERNS = [
     r"curl\s+.*\|\s*(?:bash|sh)",  # curl pipe to shell
     r"wget\s+.*\|\s*(?:bash|sh)",  # wget pipe to shell
     r"eval\s*\(\s*(?:atob|Buffer\.from)",  # eval with base64 decode
+    r"eval\s+['\"`$]",  # eval with dynamic content
     r"new\s+Function\s*\(",  # dynamic function creation
     r"child_process.*exec",  # command execution
     r"\bexec(?:Sync)?\s*\(",  # exec calls
@@ -138,6 +153,10 @@ SUSPICIOUS_SCRIPT_PATTERNS = [
     r'Buffer\.from\s*\([^)]+,\s*[\'"]base64[\'"]\)',  # base64 decoding
     r"\batob\s*\(",  # base64 decode in browser context
     r"node\s+setup_bun\.js",  # Fake Bun installer (Second Coming attack)
+    r"npx\s+--yes\s+[^@\s]+@",  # npx auto-install versioned package (suspicious)
+    r"node\s+-e\s+['\"].*?(?:http|eval|Buffer\.from)",  # Inline Node.js execution
+    r"releases/download.*trufflehog",  # TruffleHog binary download
+    r"github\.com/trufflesecurity/trufflehog",  # TruffleHog GitHub download
 ]
 
 # Destructive payload patterns (fallback when credential theft fails)
@@ -415,6 +434,16 @@ def scan_for_workflows(root: Path):
         candidate = root / rel
         if candidate.is_file():
             hits.append(str(candidate))
+
+    # Check for formatter_*.yml pattern in workflows directory
+    workflows_dir = root / ".github" / "workflows"
+    if workflows_dir.is_dir():
+        for workflow_file in workflows_dir.iterdir():
+            if workflow_file.is_file():
+                for pattern in IOC_WORKFLOW_PATTERNS:
+                    if re.search(pattern, workflow_file.name):
+                        hits.append(str(workflow_file))
+                        break
 
     # Generic search for discussion body echo pattern
     pattern = re.compile(r"github\.event\.discussion\.body")
