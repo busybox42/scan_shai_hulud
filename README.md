@@ -203,7 +203,7 @@ python update_iocs.py
 
 ## Compromised Packages
 
-The scanner includes a comprehensive database of **2,300+ compromised package versions** from multiple attack campaigns:
+The scanner includes a comprehensive database of **2,500+ compromised package versions** from multiple attack campaigns:
 
 **September 2025 - Chalk/Debug Crypto Theft Attack:**
 - Popular packages with 2+ billion weekly downloads: `chalk`, `debug`, `ansi-styles`, `supports-color`
