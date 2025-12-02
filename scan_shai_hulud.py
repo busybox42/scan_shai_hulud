@@ -143,6 +143,11 @@ CRYPTO_THEFT_FUNCTIONS = {
 SUSPICIOUS_SCRIPT_PATTERNS = [
     r"curl\s+.*\|\s*(?:bash|sh)",  # curl pipe to shell
     r"wget\s+.*\|\s*(?:bash|sh)",  # wget pipe to shell
+    r"`curl\s+[^`]+`",  # Subshell backtick curl execution
+    r"`wget\s+[^`]+`",  # Subshell backtick wget execution
+    r"\$\(curl\s+",  # Command substitution with curl
+    r"\$\(wget\s+",  # Command substitution with wget
+    r"bash\s+-c\s+.*(?:curl|wget)",  # bash -c with network fetch
     r"eval\s*\(\s*(?:atob|Buffer\.from)",  # eval with base64 decode
     r"eval\s+['\"`$]",  # eval with dynamic content
     r"new\s+Function\s*\(",  # dynamic function creation
@@ -151,12 +156,35 @@ SUSPICIOUS_SCRIPT_PATTERNS = [
     r"\bspawn(?:Sync)?\s*\(",  # spawn calls
     r"https?://[^\s]*\?.*(?:env|token|secret)",  # URL with sensitive params
     r'Buffer\.from\s*\([^)]+,\s*[\'"]base64[\'"]\)',  # base64 decoding
+    r'Buffer\.from\s*\([^)]+,\s*[\'"]hex[\'"]\)',  # hex decoding (obfuscation)
     r"\batob\s*\(",  # base64 decode in browser context
+    r"String\.fromCharCode",  # Character code obfuscation
     r"node\s+setup_bun\.js",  # Fake Bun installer (Second Coming attack)
     r"npx\s+--yes\s+[^@\s]+@",  # npx auto-install versioned package (suspicious)
     r"node\s+-e\s+['\"].*?(?:http|eval|Buffer\.from)",  # Inline Node.js execution
     r"releases/download.*trufflehog",  # TruffleHog binary download
     r"github\.com/trufflesecurity/trufflehog",  # TruffleHog GitHub download
+    r"docker\s+run\s+.*--privileged",  # Docker privilege escalation
+    r"docker\s+run\s+.*-v\s+/:/",  # Docker host filesystem mount
+    r"api\.github\.com",  # GitHub API calls in install scripts (exfil)
+    r"actions/upload-artifact",  # GitHub Actions artifact upload (exfil)
+    r"http://[^\s]+",  # Plain HTTP (insecure network calls)
+]
+
+# Safe install scripts that should NOT trigger alerts (whitelist)
+SAFE_SCRIPT_PATTERNS = [
+    r"^tsc\b",  # TypeScript compiler
+    r"^node-gyp\b",  # Native addon build
+    r"^prebuild-install\b",  # Prebuilt binary installer
+    r"^opencollective-postinstall\b",  # Donation prompt
+    r"^electron-builder\s+install-app-deps\b",  # Electron deps
+    r"^lerna\s+bootstrap\b",  # Lerna monorepo
+    r"^(?:nx|turbo)\s+run\b",  # Monorepo task runners
+    r"^esbuild\b",  # Fast bundler
+    r"^husky\b",  # Git hooks manager
+    r"^patch-package\b",  # Package patching
+    r"^ngcc\b",  # Angular compiler
+    r"^node\s+scripts/",  # Local scripts directory
 ]
 
 # Destructive payload patterns (fallback when credential theft fails)
@@ -693,6 +721,7 @@ def scan_for_suspicious_scripts(root: Path):
     hits = {}
     dir_count = 0
     patterns = [re.compile(p, re.IGNORECASE) for p in SUSPICIOUS_SCRIPT_PATTERNS]
+    safe_patterns = [re.compile(p, re.IGNORECASE) for p in SAFE_SCRIPT_PATTERNS]
 
     for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
         dir_count += 1
@@ -720,10 +749,16 @@ def scan_for_suspicious_scripts(root: Path):
                 continue
 
             suspicious_scripts = []
-            for script_name in ["preinstall", "postinstall", "prepare", "prepublish", "prepublishOnly"]:
+            for script_name in ["preinstall", "postinstall", "prepare", "prepublish", "prepublishOnly", "install"]:
                 script_content = scripts.get(script_name, "")
                 if not script_content:
                     continue
+                
+                # Skip known safe scripts (whitelist)
+                is_safe = any(sp.match(script_content.strip()) for sp in safe_patterns)
+                if is_safe:
+                    continue
+                
                 for pattern in patterns:
                     if pattern.search(script_content):
                         suspicious_scripts.append((script_name, script_content[:200]))
@@ -799,6 +834,8 @@ def scan_for_obfuscated_code(root: Path):
         (r"\\u[0-9a-fA-F]{4}", "unicode escapes"),
         (r"_0x[a-fA-F0-9]+", "obfuscator vars (_0x...)"),
         (r"\['\\x", "hex array access"),
+        (r"String\.fromCharCode\s*\(", "fromCharCode obfuscation"),
+        (r"unescape\s*\(\s*['\"]%", "unescape percent encoding"),
     ]
 
     for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
@@ -1169,8 +1206,10 @@ def scan_git_hooks(root: Path):
         (r"eval\s+", "eval usage"),
         (r"base64\s+-d", "base64 decode"),
         (r"\$\(curl", "command substitution with curl"),
-        (r"nc\s+-", "netcat usage"),
+        (r"nc\s+-", "netcat reverse shell"),
+        (r"socat\s+", "socat backdoor"),
         (r"/dev/tcp/", "bash TCP redirect"),
+        (r"mkfifo.*nc", "named pipe + netcat"),
     ]
     
     for hook_file in hooks_dir.iterdir():
