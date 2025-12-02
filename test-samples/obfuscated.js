@@ -28,3 +28,4 @@ var k = "\x73\x74\x61\x72\x74";
 
 console[_0x1a2b[0]]("Obfuscated test file");
 
+

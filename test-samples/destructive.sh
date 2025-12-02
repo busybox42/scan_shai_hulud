@@ -8,3 +8,4 @@ echo "This would be very bad:"
 
 echo "Test file for scanner - patterns trigger detection"
 
+

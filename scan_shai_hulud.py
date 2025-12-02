@@ -810,8 +810,7 @@ def scan_github_actions_secrets(root: Path):
         return hits
 
     suspicious_patterns = [
-        r"echo\s+.*\$\{\{\s*secrets\.",  # Echoing secrets
-        r"env:\s*\n\s+\w+:\s*\$\{\{\s*secrets\.",  # Secrets in env vars
+        r"echo\s+.*\$\{\{\s*secrets\.",  # Echoing secrets (leaks to logs)
         r"curl.*\$\{\{\s*secrets\.",  # Secrets in curl commands
         r"wget.*\$\{\{\s*secrets\.",  # Secrets in wget commands
         r"toJSON\s*\(\s*secrets\s*\)",  # Dumping all secrets

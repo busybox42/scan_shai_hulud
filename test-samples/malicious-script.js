@@ -20,3 +20,4 @@ function checkethereumw() {
 
 console.log("This file triggers scanner detections for testing");
 
+

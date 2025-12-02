@@ -31,3 +31,4 @@ python ../scan_shai_hulud.py --json . | jq '.summary'
 
 Expected result: Exit code 2 (high severity findings)
 
+
