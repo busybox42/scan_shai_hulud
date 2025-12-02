@@ -1022,7 +1022,8 @@ def scan_for_suspicious_namespaces(root: Path):
                 for ns in SUSPICIOUS_NAMESPACES:
                     if pkg_name.startswith(ns + "/"):
                         # Only flag if not in known compromised list (those are already caught)
-                        if pkg_name not in COMPROMISED_PACKAGES:
+                        pkg_key = f"{pkg_name}:{pkg_version}"
+                        if pkg_name not in COMPROMISED_PACKAGES and pkg_key not in COMPROMISED_PACKAGES_EXACT:
                             suspicious.append((pkg_name, pkg_version, ns))
                         break
 
@@ -1200,20 +1201,25 @@ def scan_git_hooks(root: Path):
     return hits
 
 
-def compute_file_hash(path: Path) -> str:
-    """Compute SHA256 hash of a file."""
-    sha256 = hashlib.sha256()
+def compute_file_hash(path: Path, algorithm: str = "sha256") -> str:
+    """Compute hash of a file using specified algorithm."""
+    if algorithm == "sha256":
+        hasher = hashlib.sha256()
+    elif algorithm == "sha1":
+        hasher = hashlib.sha1()
+    else:
+        hasher = hashlib.sha256()
     try:
         with path.open("rb") as f:
             for chunk in iter(lambda: f.read(8192), b""):
-                sha256.update(chunk)
-        return sha256.hexdigest()
+                hasher.update(chunk)
+        return hasher.hexdigest()
     except OSError:
         return ""
 
 
 def scan_for_malicious_hashes(root: Path):
-    """Scan JavaScript files for known malicious SHA256 hashes."""
+    """Scan JavaScript files for known malicious SHA256 and SHA1 hashes."""
     hits = []
     dir_count = 0
 
@@ -1238,9 +1244,17 @@ def scan_for_malicious_hashes(root: Path):
             if size > 1024 * 1024:
                 continue
             
-            file_hash = compute_file_hash(path)
-            if file_hash in MALICIOUS_HASHES:
-                hits.append((str(path), file_hash))
+            # Check SHA256 hashes
+            sha256_hash = compute_file_hash(path, "sha256")
+            if sha256_hash in MALICIOUS_HASHES:
+                hits.append((str(path), f"SHA256:{sha256_hash}"))
+                continue
+            
+            # Check SHA1 hashes (Shai-Hulud 2.0 specific files)
+            sha1_hash = compute_file_hash(path, "sha1")
+            if sha1_hash in MALICIOUS_SHA1_HASHES:
+                matched_file = MALICIOUS_SHA1_HASHES[sha1_hash]
+                hits.append((str(path), f"SHA1:{sha1_hash} ({matched_file})"))
 
     return hits
 
@@ -1462,10 +1476,6 @@ def main():
     )
     args = parser.parse_args()
     root = Path(args.root).resolve()
-
-    if args.quiet:
-        global PROGRESS_EVERY
-        PROGRESS_EVERY = 999999999  # Effectively disable progress
 
     if not root.exists():
         print(f"[!] Root path does not exist: {root}", file=sys.stderr)
@@ -1764,9 +1774,9 @@ def main():
 
     if malicious_hashes:
         print(section_header("☠", "CRITICAL: Known malicious file hashes detected", C_RED))
-        for path, file_hash in malicious_hashes:
+        for path, hash_info in malicious_hashes:
             print(f"    {C_DIM}📄{C_RESET} {path}")
-            print(f"       {C_RED}✗{C_RESET} SHA256: {C_RED}{file_hash[:16]}...{C_RESET}")
+            print(f"       {C_RED}✗{C_RESET} {C_RED}{hash_info}{C_RESET}")
 
     if malicious_domains:
         print(section_header("⛔", "HIGH: Malicious domains found", C_RED))
