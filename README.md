@@ -188,7 +188,7 @@ The scanner includes a comprehensive database of **1,677+ compromised package ve
 - `colors`, `faker` protestware (2022)
 - `node-ipc` peacenotwar malware (2022)
 
-The package list is maintained in `compromised-packages.txt` and sourced from:
+The package list is maintained in `data/compromised-packages.txt` and sourced from:
 - [StepSecurity](https://www.stepsecurity.io/blog/ctrl-tinycolor-and-40-npm-packages-compromised)
 - [Semgrep Security Advisory](https://semgrep.dev/blog/2025/security-advisory-npm-packages-using-secret-scanning-tools-to-steal-credentials/)
 - [JFrog](https://jfrog.com/blog/shai-hulud-npm-supply-chain-attack-new-compromised-packages-detected/)
@@ -246,7 +246,7 @@ MIT
 
 PRs welcome! If you discover new IOCs or compromised packages, please open an issue or PR.
 
-**To add new compromised packages**, edit `compromised-packages.txt`:
+**To add new compromised packages**, edit `data/compromised-packages.txt`:
 
 ```
 # Format: package_name:version (one per line)

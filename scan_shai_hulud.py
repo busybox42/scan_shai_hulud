@@ -210,7 +210,7 @@ RUNNER_BACKDOOR_PATTERNS = {
 # Compromised packages with known vulnerable version ranges
 # Format: "package-name": [("min_version", "max_version"), ...] or None for all versions
 # Use None as min to mean 0.0.0, None as max to mean infinity
-# NOTE: This is a fallback list. The main list is loaded from compromised-packages.txt
+# NOTE: This is a fallback list. The main list is loaded from data/compromised-packages.txt
 COMPROMISED_PACKAGES = {
     # Historical compromises with known bad versions (fallback)
     "coa": [("2.0.3", "2.0.4"), ("2.1.1", "2.1.3"), ("3.0.1", "3.1.3")],
@@ -270,9 +270,9 @@ def load_compromised_packages_file():
     """Load compromised packages from external file (package:version format)."""
     global COMPROMISED_PACKAGES_EXACT
     
-    # Try to find compromised-packages.txt in script directory
+    # Try to find compromised-packages.txt in data directory
     script_dir = Path(__file__).parent
-    pkg_file = script_dir / "compromised-packages.txt"
+    pkg_file = script_dir / "data" / "compromised-packages.txt"
     
     if not pkg_file.exists():
         return 0
@@ -1492,6 +1492,275 @@ def scan_for_runner_backdoors(root: Path):
     return hits
 
 
+def scan_npm_cache():
+    """Scan npm cache for compromised packages."""
+    hits = []
+    
+    # Common npm cache locations
+    cache_locations = [
+        Path.home() / ".npm" / "_cacache",
+        Path.home() / ".npm",
+        Path.home() / ".pnpm-store",
+        Path.home() / ".yarn" / "cache",
+        Path.home() / "AppData" / "Local" / "npm-cache",  # Windows
+        Path.home() / "AppData" / "Roaming" / "npm-cache",  # Windows alt
+    ]
+    
+    # Also check for local node_modules/.cache
+    cwd = Path.cwd()
+    if (cwd / "node_modules" / ".cache").exists():
+        cache_locations.append(cwd / "node_modules" / ".cache")
+    
+    for cache_dir in cache_locations:
+        if not cache_dir.exists():
+            continue
+        
+        # For npm _cacache, check the content-v2 index
+        index_dir = cache_dir / "content-v2"
+        if index_dir.exists():
+            # Scan package metadata in index
+            for dirpath, _, filenames in os.walk(cache_dir, followlinks=False):
+                for name in filenames:
+                    if name == "package.json":
+                        path = Path(dirpath) / name
+                        try:
+                            data = json.loads(path.read_text(encoding="utf-8", errors="ignore"))
+                            pkg_name = data.get("name", "")
+                            pkg_version = data.get("version", "")
+                            pkg_key = f"{pkg_name}:{pkg_version}"
+                            
+                            if pkg_key in COMPROMISED_PACKAGES_EXACT:
+                                hits.append((str(path), pkg_name, pkg_version, "npm cache"))
+                            elif pkg_name in COMPROMISED_PACKAGES:
+                                if is_version_in_range(pkg_version, COMPROMISED_PACKAGES[pkg_name]):
+                                    hits.append((str(path), pkg_name, pkg_version, "npm cache"))
+                        except (json.JSONDecodeError, OSError):
+                            continue
+        
+        # For yarn/pnpm, scan for package.json files
+        else:
+            for dirpath, dirnames, filenames in os.walk(cache_dir, followlinks=False):
+                # Skip deep traversal
+                if dirpath.count(os.sep) - str(cache_dir).count(os.sep) > 5:
+                    dirnames[:] = []
+                    continue
+                
+                for name in filenames:
+                    if name == "package.json":
+                        path = Path(dirpath) / name
+                        try:
+                            data = json.loads(path.read_text(encoding="utf-8", errors="ignore"))
+                            pkg_name = data.get("name", "")
+                            pkg_version = data.get("version", "")
+                            pkg_key = f"{pkg_name}:{pkg_version}"
+                            
+                            if pkg_key in COMPROMISED_PACKAGES_EXACT:
+                                hits.append((str(path), pkg_name, pkg_version, "package cache"))
+                            elif pkg_name in COMPROMISED_PACKAGES:
+                                if is_version_in_range(pkg_version, COMPROMISED_PACKAGES[pkg_name]):
+                                    hits.append((str(path), pkg_name, pkg_version, "package cache"))
+                        except (json.JSONDecodeError, OSError):
+                            continue
+    
+    return hits
+
+
+def generate_sarif_output(findings: dict, root: str) -> dict:
+    """Generate SARIF format output for GitHub Security tab integration."""
+    rules = []
+    results = []
+    rule_ids = set()
+    
+    # Define rules for each finding type
+    rule_definitions = {
+        "ioc_files": {
+            "id": "shai-hulud/ioc-file",
+            "name": "MaliciousIOCFile",
+            "shortDescription": {"text": "Known malicious IOC file detected"},
+            "fullDescription": {"text": "A file matching known Shai-Hulud malware indicators was found."},
+            "defaultConfiguration": {"level": "error"},
+            "properties": {"security-severity": "9.0", "tags": ["security", "malware", "supply-chain"]}
+        },
+        "suspicious_workflows": {
+            "id": "shai-hulud/workflow",
+            "name": "SuspiciousWorkflow",
+            "shortDescription": {"text": "Suspicious GitHub workflow detected"},
+            "fullDescription": {"text": "A GitHub Actions workflow matching Shai-Hulud patterns was found."},
+            "defaultConfiguration": {"level": "error"},
+            "properties": {"security-severity": "9.0", "tags": ["security", "ci-cd", "supply-chain"]}
+        },
+        "compromised_packages": {
+            "id": "shai-hulud/package",
+            "name": "CompromisedPackage",
+            "shortDescription": {"text": "Compromised npm package detected"},
+            "fullDescription": {"text": "A lockfile contains a known compromised package version."},
+            "defaultConfiguration": {"level": "error"},
+            "properties": {"security-severity": "8.5", "tags": ["security", "dependency", "supply-chain"]}
+        },
+        "malicious_hashes": {
+            "id": "shai-hulud/hash",
+            "name": "MaliciousFileHash",
+            "shortDescription": {"text": "Known malicious file hash detected"},
+            "fullDescription": {"text": "A file matching a known malicious SHA256/SHA1 hash was found."},
+            "defaultConfiguration": {"level": "error"},
+            "properties": {"security-severity": "10.0", "tags": ["security", "malware"]}
+        },
+        "exfil_endpoints": {
+            "id": "shai-hulud/exfil",
+            "name": "ExfiltrationEndpoint",
+            "shortDescription": {"text": "Data exfiltration endpoint detected"},
+            "fullDescription": {"text": "Code referencing known exfiltration endpoints (webhook.site, etc.) was found."},
+            "defaultConfiguration": {"level": "error"},
+            "properties": {"security-severity": "8.0", "tags": ["security", "exfiltration"]}
+        },
+        "suspicious_scripts": {
+            "id": "shai-hulud/script",
+            "name": "SuspiciousScript",
+            "shortDescription": {"text": "Suspicious install script detected"},
+            "fullDescription": {"text": "A package.json contains suspicious preinstall/postinstall scripts."},
+            "defaultConfiguration": {"level": "warning"},
+            "properties": {"security-severity": "7.0", "tags": ["security", "scripts"]}
+        },
+        "npm_cache": {
+            "id": "shai-hulud/cache",
+            "name": "CacheCompromised",
+            "shortDescription": {"text": "Compromised package in npm cache"},
+            "fullDescription": {"text": "The npm cache contains a known compromised package."},
+            "defaultConfiguration": {"level": "error"},
+            "properties": {"security-severity": "8.0", "tags": ["security", "cache", "supply-chain"]}
+        },
+    }
+    
+    def add_result(rule_id: str, message: str, file_path: str, line: int = 1):
+        if rule_id not in rule_ids:
+            if rule_id in rule_definitions:
+                rules.append(rule_definitions[rule_id])
+                rule_ids.add(rule_id)
+        
+        # Make path relative to root
+        try:
+            rel_path = str(Path(file_path).relative_to(root))
+        except ValueError:
+            rel_path = file_path
+        
+        results.append({
+            "ruleId": rule_id,
+            "level": "error" if "critical" in rule_id or "hash" in rule_id else "warning",
+            "message": {"text": message},
+            "locations": [{
+                "physicalLocation": {
+                    "artifactLocation": {"uri": rel_path},
+                    "region": {"startLine": line}
+                }
+            }]
+        })
+    
+    # Process each finding type
+    high_severity = findings.get("high_severity", {})
+    medium_severity = findings.get("medium_severity", {})
+    
+    for path in high_severity.get("ioc_files", []):
+        add_result("shai-hulud/ioc-file", f"Malicious IOC file: {Path(path).name}", path)
+    
+    for path in high_severity.get("suspicious_workflows", []):
+        add_result("shai-hulud/workflow", f"Suspicious workflow: {Path(path).name}", path)
+    
+    for lockfile, pkgs in high_severity.get("compromised_packages", {}).items():
+        for pkg_name, pkg_version, _ in pkgs:
+            add_result("shai-hulud/package", f"Compromised package: {pkg_name}@{pkg_version}", lockfile)
+    
+    for path, hash_info in high_severity.get("malicious_hashes", []):
+        add_result("shai-hulud/hash", f"Malicious file hash: {hash_info}", path)
+    
+    for path, endpoint, _ in high_severity.get("exfil_endpoints", []):
+        add_result("shai-hulud/exfil", f"Exfiltration endpoint: {endpoint}", path)
+    
+    for pkg_path, scripts in medium_severity.get("suspicious_scripts", {}).items():
+        for script_name, _ in scripts:
+            add_result("shai-hulud/script", f"Suspicious {script_name} script", pkg_path)
+    
+    for path, pkg_name, pkg_version, location in high_severity.get("npm_cache", []):
+        add_result("shai-hulud/cache", f"Cached compromised package: {pkg_name}@{pkg_version}", path)
+    
+    return {
+        "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+        "version": "2.1.0",
+        "runs": [{
+            "tool": {
+                "driver": {
+                    "name": "scan_shai_hulud",
+                    "version": "1.0.0",
+                    "informationUri": "https://github.com/yourusername/scan_shai_hulud",
+                    "rules": rules
+                }
+            },
+            "results": results
+        }]
+    }
+
+
+def generate_csv_output(findings: dict, root: str) -> str:
+    """Generate CSV format output for forensic analysis."""
+    import csv
+    import io
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow(["Severity", "Category", "File_Path", "Issue_Type", "Details", "Recommendation"])
+    
+    high_severity = findings.get("high_severity", {})
+    medium_severity = findings.get("medium_severity", {})
+    low_severity = findings.get("low_severity", {})
+    
+    def sanitize(value: str) -> str:
+        """Sanitize value to prevent CSV injection."""
+        if value and value[0] in ("=", "+", "-", "@", "\t", "\r"):
+            return "'" + value
+        return value
+    
+    # High severity findings
+    for path in high_severity.get("ioc_files", []):
+        writer.writerow(["CRITICAL", "IOC_FILE", sanitize(path), "Malicious file", Path(path).name, "Delete immediately"])
+    
+    for path in high_severity.get("suspicious_workflows", []):
+        writer.writerow(["CRITICAL", "WORKFLOW", sanitize(path), "Malicious workflow", Path(path).name, "Delete and audit CI/CD"])
+    
+    for lockfile, pkgs in high_severity.get("compromised_packages", {}).items():
+        for pkg_name, pkg_version, _ in pkgs:
+            writer.writerow(["HIGH", "LOCKFILE_HIT", sanitize(lockfile), "Compromised package", f"{pkg_name}@{pkg_version}", "Remove from lockfile and reinstall"])
+    
+    for path, hash_info in high_severity.get("malicious_hashes", []):
+        writer.writerow(["CRITICAL", "FORENSIC_MATCH", sanitize(path), "Known malware hash", hash_info, "Delete file, assume breach"])
+    
+    for path, endpoint, snippet in high_severity.get("exfil_endpoints", []):
+        writer.writerow(["HIGH", "EXFIL_ENDPOINT", sanitize(path), "Exfiltration URL", endpoint, "Review code, rotate credentials"])
+    
+    for path, findings_list in high_severity.get("crypto_theft", []):
+        writer.writerow(["HIGH", "CRYPTO_THEFT", sanitize(path), "Wallet theft pattern", "; ".join(findings_list), "Delete file, check wallets"])
+    
+    for path, pattern, snippet in high_severity.get("destructive_payloads", []):
+        writer.writerow(["HIGH", "DESTRUCTIVE", sanitize(path), "Destructive payload", pattern, "Delete file immediately"])
+    
+    for path, pkg_name, pkg_version, location in high_severity.get("npm_cache", []):
+        writer.writerow(["HIGH", "CACHE_HIT", sanitize(path), "Cached malware", f"{pkg_name}@{pkg_version}", "Clear npm cache"])
+    
+    # Medium severity
+    for path, matched_str, snippet in medium_severity.get("ioc_strings", []):
+        writer.writerow(["MEDIUM", "IOC_STRING", sanitize(path), "Suspicious string", matched_str, "Manual review"])
+    
+    for pkg_path, scripts in medium_severity.get("suspicious_scripts", {}).items():
+        for script_name, content in scripts:
+            writer.writerow(["MEDIUM", "SUSPICIOUS_SCRIPT", sanitize(pkg_path), f"{script_name} script", sanitize(content[:100]), "Review before npm install"])
+    
+    # Low severity
+    for path, indicators in low_severity.get("obfuscated_code", []):
+        writer.writerow(["LOW", "OBFUSCATION", sanitize(path), "Obfuscated code", "; ".join(indicators), "Manual review"])
+    
+    return output.getvalue()
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Scan for Shai-Hulud npm supply-chain IOCs on a local tree."
@@ -1506,6 +1775,21 @@ def main():
         "--json",
         action="store_true",
         help="Output results as JSON for programmatic consumption",
+    )
+    parser.add_argument(
+        "--sarif",
+        action="store_true",
+        help="Output results as SARIF for GitHub Security tab integration",
+    )
+    parser.add_argument(
+        "--csv",
+        metavar="FILE",
+        help="Write CSV report to FILE for forensic analysis",
+    )
+    parser.add_argument(
+        "--scan-cache",
+        action="store_true",
+        help="Also scan npm/yarn/pnpm cache directories",
     )
     parser.add_argument(
         "--quiet",
@@ -1634,6 +1918,13 @@ def main():
         _progress_bar.set_description(".npmrc")
     npmrc_issues = scan_npmrc_files(root)
     
+    # Optional: Scan npm cache
+    npm_cache_hits = []
+    if args.scan_cache:
+        if show_progress:
+            _progress_bar.set_description("npm cache")
+        npm_cache_hits = scan_npm_cache()
+    
     # Finish progress bar
     if show_progress and _progress_bar:
         _progress_bar.finish()
@@ -1656,6 +1947,7 @@ def main():
         "git_remotes": git_remotes,
         "git_hooks": git_hooks,
         "npmrc_issues": npmrc_issues,
+        "npm_cache": npm_cache_hits,  # Compromised packages in npm cache
     }
 
     medium_severity = {
@@ -1679,22 +1971,41 @@ def main():
     low_count = sum(len(f) if isinstance(f, (list, dict)) else 0 for f in low_severity.values())
     total_findings = high_count + medium_count + low_count
 
+    # Prepare findings dict for output formats
+    findings_dict = {
+        "root": str(root),
+        "summary": {
+            "total_findings": total_findings,
+            "high_severity": high_count,
+            "medium_severity": medium_count,
+            "low_severity": low_count,
+            "compromised": high_count > 0,
+        },
+        "high_severity": high_severity,
+        "medium_severity": medium_severity,
+        "low_severity": low_severity,
+    }
+
+    # CSV output (write to file)
+    if args.csv:
+        csv_content = generate_csv_output(findings_dict, str(root))
+        try:
+            with open(args.csv, "w", encoding="utf-8", newline="") as f:
+                f.write(csv_content)
+            if not args.json and not args.sarif:
+                print(f"[✓] CSV report written to: {args.csv}")
+        except OSError as e:
+            print(f"[!] Failed to write CSV: {e}", file=sys.stderr)
+
+    # SARIF output mode (for GitHub Security tab)
+    if args.sarif:
+        sarif_output = generate_sarif_output(findings_dict, str(root))
+        print(json.dumps(sarif_output, indent=2))
+        sys.exit(2 if high_count > 0 else (1 if medium_count > 0 else 0))
+
     # JSON output mode
     if args.json:
-        output = {
-            "root": str(root),
-            "summary": {
-                "total_findings": total_findings,
-                "high_severity": high_count,
-                "medium_severity": medium_count,
-                "low_severity": low_count,
-                "compromised": high_count > 0,
-            },
-            "high_severity": high_severity,
-            "medium_severity": medium_severity,
-            "low_severity": low_severity,
-        }
-        print(json.dumps(output, indent=2, default=str))
+        print(json.dumps(findings_dict, indent=2, default=str))
         sys.exit(2 if high_count > 0 else (1 if medium_count > 0 else 0))
 
     # Color and style definitions
@@ -1867,6 +2178,13 @@ def main():
             print(f"    {C_DIM}📄{C_RESET} {npmrc_path}")
             for finding in findings:
                 print(f"       {C_RED}✗{C_RESET} {finding}")
+
+    if npm_cache_hits:
+        print(section_header("⛔", "HIGH: Compromised packages in npm cache", C_RED))
+        for path, pkg_name, pkg_version, location in npm_cache_hits:
+            print(f"    {C_DIM}📦{C_RESET} {path}")
+            print(f"       {C_RED}✗{C_RESET} {pkg_name}@{C_RED}{pkg_version}{C_RESET} ({location})")
+        print(f"\n    {C_DIM}Run: npm cache clean --force{C_RESET}")
 
     # === MEDIUM SEVERITY ===
     if strings:
