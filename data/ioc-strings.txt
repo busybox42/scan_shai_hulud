@@ -1,0 +1,12 @@
+# Shai-Hulud Campaign Marker Strings
+# These strings indicate involvement in the attack campaign
+
+Shai-Hulud
+Sha1-Hulud
+SHA1HULUD
+Sha1Hulud
+The Continued Coming
+ShaiHulud
+shai_hulud
+SHAI_HULUD
+

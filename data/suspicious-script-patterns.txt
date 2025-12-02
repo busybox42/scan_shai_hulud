@@ -1,0 +1,53 @@
+# Suspicious Script Patterns (regex)
+# Patterns for detecting malicious preinstall/postinstall scripts
+
+# Shell pipe to execution
+curl\s+.*\|\s*(?:bash|sh)
+wget\s+.*\|\s*(?:bash|sh)
+
+# Subshell execution patterns
+`curl\s+[^`]+`
+`wget\s+[^`]+`
+\$\(curl\s+
+\$\(wget\s+
+bash\s+-c\s+.*(?:curl|wget)
+
+# Dynamic code execution
+eval\s*\(\s*(?:atob|Buffer\.from)
+eval\s+['\"`$]
+new\s+Function\s*\(
+
+# Process spawning
+child_process.*exec
+\bexec(?:Sync)?\s*\(
+\bspawn(?:Sync)?\s*\(
+
+# Network with sensitive params
+https?://[^\s]*\?.*(?:env|token|secret)
+
+# Encoding/obfuscation
+Buffer\.from\s*\([^)]+,\s*[\'"]base64[\'"]\)
+Buffer\.from\s*\([^)]+,\s*[\'"]hex[\'"]\)
+\batob\s*\(
+String\.fromCharCode
+
+# Shai-Hulud 2.0 specific
+node\s+setup_bun\.js
+npx\s+--yes\s+[^@\s]+@
+node\s+-e\s+['\"].*?(?:http|eval|Buffer\.from)
+
+# TruffleHog download
+releases/download.*trufflehog
+github\.com/trufflesecurity/trufflehog
+
+# Docker privilege escalation
+docker\s+run\s+.*--privileged
+docker\s+run\s+.*-v\s+/:/
+
+# GitHub API/artifact exfiltration
+api\.github\.com
+actions/upload-artifact
+
+# Plain HTTP (insecure)
+http://[^\s]+
+

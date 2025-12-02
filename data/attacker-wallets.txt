@@ -1,0 +1,12 @@
+# Known Attacker Cryptocurrency Wallets
+# From chalk/debug crypto theft attack (Sept 2025)
+
+# Ethereum
+0xFc4a4858bafef54D1b1d7697bfb5c52F4c166976
+
+# Bitcoin
+1H13VnQJKtT4HjD5ZFKaaiZEetMbG7nDHx
+
+# Tron
+TB9emsCq6fQw6wRk4HBxxNnU6Hwt1DnV67
+

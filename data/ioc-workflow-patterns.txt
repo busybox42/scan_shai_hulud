@@ -1,0 +1,7 @@
+# Workflow Filename Patterns (regex)
+# For dynamic matching of suspicious workflow names
+
+# Shai-Hulud 2.0 pattern - formatter_*.yml
+formatter_\d+\.yml$
+formatter_\d+\.yaml$
+

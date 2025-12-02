@@ -1,0 +1,34 @@
+# Exfiltration Endpoints
+# Services commonly abused for data exfiltration
+# webhook.site is the PRIMARY endpoint for Shai-Hulud
+
+# PRIMARY - Shai-Hulud exfil endpoint
+webhook.site
+
+# Known malicious webhook.site UUIDs
+bb8ca5f6-4175-45d2-b042-fc9ebb8170b7
+
+# Messaging/webhook services
+discord.com/api/webhooks
+api.telegram.org
+hooks.slack.com
+
+# Request capture services
+requestbin.com
+beeceptor.com
+pipedream.com
+zapier.com/hooks
+
+# Tunneling services
+ngrok.io
+localtunnel.me
+serveo.net
+
+# Paste/file sharing
+pastebin.com
+hastebin.com
+ix.io
+0x0.st
+transfer.sh
+file.io
+

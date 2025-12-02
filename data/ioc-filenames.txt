@@ -1,0 +1,27 @@
+# Shai-Hulud IOC Filenames
+# Known malicious artifact filenames from various attack waves
+
+# Exfiltration artifacts
+cloud.json
+contents.json
+environment.json
+truffleSecrets.json
+actionsSecrets.json
+secrets.json
+env_dump.json
+ci_secrets.json
+runner_env.json
+github_context.json
+workflow_secrets.json
+
+# TruffleHog artifacts
+trufflehog_results.json
+trufflehog_output.json
+
+# Shai-Hulud 2.0 "Second Coming" attack
+setup_bun.js
+bun_environment.js
+
+# Common obfuscated payload
+bundle.js
+

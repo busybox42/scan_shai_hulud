@@ -1,0 +1,8 @@
+# Crypto Theft Function Names
+# Malicious function names from chalk/debug attack (Sept 8, 2025)
+
+checkethereumw
+runmask
+newdlocal
+_0x19ca67
+

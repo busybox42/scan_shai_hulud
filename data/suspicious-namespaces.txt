@@ -1,0 +1,30 @@
+# Suspicious npm Namespaces
+# Namespaces known to be targeted by supply chain attacks
+# Packages from these namespaces warrant extra scrutiny
+
+@ctrl
+@crowdstrike
+@art-ws
+@postman
+@asyncapi
+@zapier
+@ensdomains
+@posthog
+@lottiefiles
+@rspack
+@solana
+@nativescript-community
+@ahmedhfarag
+@operato
+@teselagen
+@things-factory
+@hestjs
+@nstudio
+@voiceflow
+@oku-ui
+@browserbasehq
+@ntnx
+@pergel
+@silgi
+@mcp-use
+

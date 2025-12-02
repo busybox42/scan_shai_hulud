@@ -1,0 +1,17 @@
+# Destructive Payload Patterns (regex)
+# Patterns that indicate destructive fallback behavior
+
+# Unix rm -rf
+rm\s+-rf\s+[\$~]HOME
+rm\s+-rf\s+~/
+rm\s+-rf\s+/home/
+
+# Node.js recursive delete
+fs\.rmSync\s*\([^)]*recursive\s*:\s*true
+fs\.rm\s*\([^)]*recursive\s*:\s*true
+rimraf\s+[\$~]HOME
+
+# Windows delete
+Remove-Item\s+-Recurse.*\$HOME
+del\s+/s\s+/q.*%USERPROFILE%
+

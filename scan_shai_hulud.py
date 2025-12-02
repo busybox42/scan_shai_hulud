@@ -9,254 +9,202 @@ import subprocess
 import sys
 from pathlib import Path
 
-# High-signal filenames and workflow paths from Shai-Hulud analysis
-IOC_FILENAMES = {
-    "cloud.json",
-    "contents.json",
-    "environment.json",
-    "truffleSecrets.json",
-    "actionsSecrets.json",  # Double Base64 encoded credentials (Nov 2025)
-    "setup_bun.js",  # Fake Bun installer (Second Coming attack)
-    "bun_environment.js",  # Obfuscated payload (Second Coming attack)
-    "bundle.js",  # Common obfuscated payload filename
-    # Additional exfiltration artifacts
-    "secrets.json",
-    "env_dump.json",
-    "ci_secrets.json",
-    "runner_env.json",
-    "github_context.json",
-    "workflow_secrets.json",
-    # TruffleHog-related artifacts
-    "trufflehog_results.json",
-    "trufflehog_output.json",
-}
+# =============================================================================
+# IOC DATA - Loaded from data/ directory at runtime
+# =============================================================================
+# All IOC lists are stored in data/*.txt files for easy updates
+# See data/ directory for the actual values
 
-# Known malicious SHA256 hashes of bundle.js variants (V1-V7)
-# Source: Socket.dev, JFrog security reports
-MALICIOUS_HASHES = {
-    "de0e25a3e6c1e1e5998b306b7141b3dc4c0088da9d7bb47c1c00c91e6e4f85d6",
-    "81d2a004a1bca6ef87a1caf7d0e0b355ad1764238e40ff6d1b1cb77ad4f595c3",
-    "83a650ce44b2a9854802a7fb4c202877815274c129af49e6c2d1d5d5d55c501e",
-    "4b2399646573bb737c4969563303d8ee2e9ddbd1b271f1ca9e35ea78062538db",
-    "dc67467a39b70d1cd4c1f7f7a459b35058163592f4a9e8fb4dffcbba98ef210c",
-    "46faab8ab153fae6e80e7cca38eab363075bb524edd79e42269217a083628f09",
-    "b74caeaa75e077c99f7d44f46daaf9796a3be43ecf24f2a1fd381844669da777",
-}
+# Data directory path
+DATA_DIR = Path(__file__).parent / "data"
 
-IOC_WORKFLOW_PATHS = {
-    ".github/workflows/discussion.yaml",
-    ".github/workflows/discussion.yml",
-    ".github/workflows/formatter_123456789.yml",
-    ".github/workflows/shai-hulud-workflow.yml",
-    ".github/workflows/shai-hulud-workflow.yaml",
-    ".github/workflows/shai-hulud.yml",
-    ".github/workflows/shai-hulud.yaml",
-    # Additional suspicious workflow names
-    ".github/workflows/sync.yml",
-    ".github/workflows/sync.yaml",
-    ".github/workflows/update.yml",
-    ".github/workflows/update.yaml",
-    ".github/workflows/ci-helper.yml",
-    ".github/workflows/ci-helper.yaml",
-    ".github/workflows/auto-publish.yml",
-    ".github/workflows/auto-publish.yaml",
-}
+# IOC containers (populated by load_all_ioc_data())
+IOC_FILENAMES: set = set()
+MALICIOUS_HASHES: set = set()  # SHA256 hashes
+MALICIOUS_SHA1_HASHES: dict = {}  # SHA1 -> filename mapping
+IOC_WORKFLOW_PATHS: set = set()
+IOC_WORKFLOW_PATTERNS: list = []
+IOC_STRINGS: set = set()
+IOC_DOMAINS: set = set()
+IOC_EXFIL_ENDPOINTS: set = set()
+ATTACKER_WALLETS: set = set()
+CRYPTO_THEFT_FUNCTIONS: set = set()
+SUSPICIOUS_SCRIPT_PATTERNS: list = []
+SAFE_SCRIPT_PATTERNS: list = []
+DESTRUCTIVE_PATTERNS: list = []
+RUNNER_BACKDOOR_PATTERNS: set = set()
+COMPROMISED_PACKAGES: dict = {}  # Version ranges fallback
+COMPROMISED_PACKAGES_EXACT: set = set()  # Exact package:version pairs
+SUSPICIOUS_NAMESPACES: set = set()
 
-# Workflow filename patterns (regex) for dynamic matching
-IOC_WORKFLOW_PATTERNS = [
-    r"formatter_\d+\.yml$",  # formatter_*.yml - Shai-Hulud 2.0 pattern
-    r"formatter_\d+\.yaml$",
-]
 
-# Repo / description markers
-IOC_STRINGS = {
-    "Shai-Hulud",
-    "Sha1-Hulud",
-    "SHA1HULUD",
-    "Sha1Hulud",
-    "The Continued Coming",
-    # Additional campaign markers
-    "ShaiHulud",
-    "shai_hulud",
-    "SHAI_HULUD",
-}
+# =============================================================================
+# DATA LOADERS
+# =============================================================================
 
-# Known malicious domains and exfiltration endpoints
-IOC_DOMAINS = {
-    "evilpackage.com",
-    "npm-stats.com",
-    "npm-registry.com",
-    "registry-npm.com",
-    "npmpkg.com",
-    "npmpackage.com",
-    "pkgstats.com",
-    "telemetry-npm.com",
-    "npmjs.help",  # Phishing domain from chalk/debug attack
-}
+def _load_lines(filename: str) -> set:
+    """Load non-empty, non-comment lines from a data file as a set."""
+    filepath = DATA_DIR / filename
+    if not filepath.exists():
+        return set()
+    result = set()
+    try:
+        with filepath.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    result.add(line)
+    except OSError:
+        pass
+    return result
 
-# Exfiltration endpoints used by Shai-Hulud and similar attacks
-# webhook.site is the PRIMARY exfil endpoint for Shai-Hulud
-IOC_EXFIL_ENDPOINTS = {
-    "webhook.site",  # PRIMARY - Shai-Hulud exfil endpoint
-    "bb8ca5f6-4175-45d2-b042-fc9ebb8170b7",  # Known malicious webhook.site UUID
-    "discord.com/api/webhooks",
-    "api.telegram.org",
-    "hooks.slack.com",
-    "requestbin.com",
-    "beeceptor.com",
-    "pipedream.com",
-    "zapier.com/hooks",
-    "ngrok.io",
-    "localtunnel.me",
-    "serveo.net",
-    "pastebin.com",
-    "hastebin.com",
-    "ix.io",
-    "0x0.st",
-    "transfer.sh",
-    "file.io",
-}
 
-# SHA1 hashes for known malicious Shai-Hulud 2.0 files
-# Source: gensecaihq/Shai-Hulud-2.0-Detector
-MALICIOUS_SHA1_HASHES = {
-    "d60ec97eea19fffb4809bc35b91033b52490ca11": "bun_environment.js",
-    "d1829b4708126dcc7bea7437c04d1f10eacd4a16": "setup_bun.js",
-}
+def _load_patterns(filename: str) -> list:
+    """Load regex patterns from a data file as a list."""
+    filepath = DATA_DIR / filename
+    if not filepath.exists():
+        return []
+    result = []
+    try:
+        with filepath.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    result.append(line)
+    except OSError:
+        pass
+    return result
 
-# Known attacker cryptocurrency wallet addresses
-ATTACKER_WALLETS = {
-    "0xFc4a4858bafef54D1b1d7697bfb5c52F4c166976",  # Ethereum
-    "1H13VnQJKtT4HjD5ZFKaaiZEetMbG7nDHx",  # Bitcoin
-    "TB9emsCq6fQw6wRk4HBxxNnU6Hwt1DnV67",  # Tron
-}
 
-# Crypto theft function names from chalk/debug attack (Sept 8, 2025)
-CRYPTO_THEFT_FUNCTIONS = {
-    "checkethereumw",
-    "runmask",
-    "newdlocal",
-    "_0x19ca67",  # Obfuscated function name
-}
+def _load_hashes(filename: str) -> tuple:
+    """Load hash file with format: algorithm:hash:description."""
+    sha256_hashes = set()
+    sha1_hashes = {}  # sha1 -> description
+    
+    filepath = DATA_DIR / filename
+    if not filepath.exists():
+        return sha256_hashes, sha1_hashes
+    
+    try:
+        with filepath.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split(":", 2)
+                if len(parts) >= 2:
+                    algo = parts[0].lower()
+                    hash_val = parts[1]
+                    desc = parts[2] if len(parts) > 2 else ""
+                    if algo == "sha256":
+                        sha256_hashes.add(hash_val)
+                    elif algo == "sha1":
+                        sha1_hashes[hash_val] = desc
+    except OSError:
+        pass
+    
+    return sha256_hashes, sha1_hashes
 
-# Suspicious code patterns in postinstall/preinstall scripts
-SUSPICIOUS_SCRIPT_PATTERNS = [
-    r"curl\s+.*\|\s*(?:bash|sh)",  # curl pipe to shell
-    r"wget\s+.*\|\s*(?:bash|sh)",  # wget pipe to shell
-    r"`curl\s+[^`]+`",  # Subshell backtick curl execution
-    r"`wget\s+[^`]+`",  # Subshell backtick wget execution
-    r"\$\(curl\s+",  # Command substitution with curl
-    r"\$\(wget\s+",  # Command substitution with wget
-    r"bash\s+-c\s+.*(?:curl|wget)",  # bash -c with network fetch
-    r"eval\s*\(\s*(?:atob|Buffer\.from)",  # eval with base64 decode
-    r"eval\s+['\"`$]",  # eval with dynamic content
-    r"new\s+Function\s*\(",  # dynamic function creation
-    r"child_process.*exec",  # command execution
-    r"\bexec(?:Sync)?\s*\(",  # exec calls
-    r"\bspawn(?:Sync)?\s*\(",  # spawn calls
-    r"https?://[^\s]*\?.*(?:env|token|secret)",  # URL with sensitive params
-    r'Buffer\.from\s*\([^)]+,\s*[\'"]base64[\'"]\)',  # base64 decoding
-    r'Buffer\.from\s*\([^)]+,\s*[\'"]hex[\'"]\)',  # hex decoding (obfuscation)
-    r"\batob\s*\(",  # base64 decode in browser context
-    r"String\.fromCharCode",  # Character code obfuscation
-    r"node\s+setup_bun\.js",  # Fake Bun installer (Second Coming attack)
-    r"npx\s+--yes\s+[^@\s]+@",  # npx auto-install versioned package (suspicious)
-    r"node\s+-e\s+['\"].*?(?:http|eval|Buffer\.from)",  # Inline Node.js execution
-    r"releases/download.*trufflehog",  # TruffleHog binary download
-    r"github\.com/trufflesecurity/trufflehog",  # TruffleHog GitHub download
-    r"docker\s+run\s+.*--privileged",  # Docker privilege escalation
-    r"docker\s+run\s+.*-v\s+/:/",  # Docker host filesystem mount
-    r"api\.github\.com",  # GitHub API calls in install scripts (exfil)
-    r"actions/upload-artifact",  # GitHub Actions artifact upload (exfil)
-    r"http://[^\s]+",  # Plain HTTP (insecure network calls)
-]
 
-# Safe install scripts that should NOT trigger alerts (whitelist)
-SAFE_SCRIPT_PATTERNS = [
-    r"^tsc\b",  # TypeScript compiler
-    r"^node-gyp\b",  # Native addon build
-    r"^prebuild-install\b",  # Prebuilt binary installer
-    r"^opencollective-postinstall\b",  # Donation prompt
-    r"^electron-builder\s+install-app-deps\b",  # Electron deps
-    r"^lerna\s+bootstrap\b",  # Lerna monorepo
-    r"^(?:nx|turbo)\s+run\b",  # Monorepo task runners
-    r"^esbuild\b",  # Fast bundler
-    r"^husky\b",  # Git hooks manager
-    r"^patch-package\b",  # Package patching
-    r"^ngcc\b",  # Angular compiler
-    r"^node\s+scripts/",  # Local scripts directory
-]
+def _load_version_ranges(filename: str) -> dict:
+    """Load package version ranges from file (format: pkg:min:max)."""
+    result = {}
+    filepath = DATA_DIR / filename
+    if not filepath.exists():
+        return result
+    
+    try:
+        with filepath.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split(":")
+                if len(parts) >= 3:
+                    pkg_name = parts[0]
+                    min_ver = parts[1] if parts[1] != "*" else None
+                    max_ver = parts[2] if parts[2] != "*" else None
+                    if pkg_name not in result:
+                        result[pkg_name] = []
+                    if min_ver is None and max_ver is None:
+                        result[pkg_name] = None  # All versions
+                    elif result[pkg_name] is not None:
+                        result[pkg_name].append((min_ver, max_ver))
+    except OSError:
+        pass
+    
+    return result
 
-# Destructive payload patterns (fallback when credential theft fails)
-DESTRUCTIVE_PATTERNS = [
-    r"rm\s+-rf\s+[\$~]HOME",  # rm -rf $HOME or ~HOME
-    r"rm\s+-rf\s+~/",  # rm -rf ~/
-    r"rm\s+-rf\s+/home/",  # rm -rf /home/
-    r'fs\.rmSync\s*\([^)]*recursive\s*:\s*true',  # Node.js recursive delete
-    r'fs\.rm\s*\([^)]*recursive\s*:\s*true',  # Node.js async recursive delete
-    r"rimraf\s+[\$~]HOME",  # rimraf $HOME
-    r"Remove-Item\s+-Recurse.*\$HOME",  # PowerShell recursive delete
-    r"del\s+/s\s+/q.*%USERPROFILE%",  # Windows cmd delete
-]
 
-# Self-hosted runner backdoor patterns (Nov 2025 attack)
-RUNNER_BACKDOOR_PATTERNS = {
-    ".dev-env/",  # Hidden directory for persistent backdoor
-    "SHA1HULUD",  # Runner naming pattern
-    "Sha1Hulud",
-    "sha1hulud",
-}
+def load_all_ioc_data() -> int:
+    """Load all IOC data from data/ directory. Returns total items loaded."""
+    global IOC_FILENAMES, MALICIOUS_HASHES, MALICIOUS_SHA1_HASHES
+    global IOC_WORKFLOW_PATHS, IOC_WORKFLOW_PATTERNS, IOC_STRINGS
+    global IOC_DOMAINS, IOC_EXFIL_ENDPOINTS, ATTACKER_WALLETS
+    global CRYPTO_THEFT_FUNCTIONS, SUSPICIOUS_SCRIPT_PATTERNS
+    global SAFE_SCRIPT_PATTERNS, DESTRUCTIVE_PATTERNS
+    global RUNNER_BACKDOOR_PATTERNS, COMPROMISED_PACKAGES
+    global COMPROMISED_PACKAGES_EXACT, SUSPICIOUS_NAMESPACES
+    
+    total = 0
+    
+    # Simple line-based sets
+    IOC_FILENAMES = _load_lines("ioc-filenames.txt")
+    total += len(IOC_FILENAMES)
+    
+    IOC_WORKFLOW_PATHS = _load_lines("ioc-workflows.txt")
+    total += len(IOC_WORKFLOW_PATHS)
+    
+    IOC_STRINGS = _load_lines("ioc-strings.txt")
+    total += len(IOC_STRINGS)
+    
+    IOC_DOMAINS = _load_lines("ioc-domains.txt")
+    total += len(IOC_DOMAINS)
+    
+    IOC_EXFIL_ENDPOINTS = _load_lines("exfil-endpoints.txt")
+    total += len(IOC_EXFIL_ENDPOINTS)
+    
+    ATTACKER_WALLETS = _load_lines("attacker-wallets.txt")
+    total += len(ATTACKER_WALLETS)
+    
+    CRYPTO_THEFT_FUNCTIONS = _load_lines("crypto-theft-functions.txt")
+    total += len(CRYPTO_THEFT_FUNCTIONS)
+    
+    RUNNER_BACKDOOR_PATTERNS = _load_lines("runner-backdoor-patterns.txt")
+    total += len(RUNNER_BACKDOOR_PATTERNS)
+    
+    SUSPICIOUS_NAMESPACES = _load_lines("suspicious-namespaces.txt")
+    total += len(SUSPICIOUS_NAMESPACES)
+    
+    # Regex patterns
+    IOC_WORKFLOW_PATTERNS = _load_patterns("ioc-workflow-patterns.txt")
+    total += len(IOC_WORKFLOW_PATTERNS)
+    
+    SUSPICIOUS_SCRIPT_PATTERNS = _load_patterns("suspicious-script-patterns.txt")
+    total += len(SUSPICIOUS_SCRIPT_PATTERNS)
+    
+    SAFE_SCRIPT_PATTERNS = _load_patterns("safe-script-patterns.txt")
+    total += len(SAFE_SCRIPT_PATTERNS)
+    
+    DESTRUCTIVE_PATTERNS = _load_patterns("destructive-patterns.txt")
+    total += len(DESTRUCTIVE_PATTERNS)
+    
+    # Hash files
+    sha256, sha1 = _load_hashes("malicious-hashes.txt")
+    MALICIOUS_HASHES = sha256
+    MALICIOUS_SHA1_HASHES = sha1
+    total += len(MALICIOUS_HASHES) + len(MALICIOUS_SHA1_HASHES)
+    
+    # Version ranges
+    COMPROMISED_PACKAGES = _load_version_ranges("compromised-packages-ranges.txt")
+    total += len(COMPROMISED_PACKAGES)
+    
+    # Exact package:version list
+    COMPROMISED_PACKAGES_EXACT = _load_lines("compromised-packages.txt")
+    total += len(COMPROMISED_PACKAGES_EXACT)
+    
+    return total
 
-# Compromised packages with known vulnerable version ranges
-# Format: "package-name": [("min_version", "max_version"), ...] or None for all versions
-# Use None as min to mean 0.0.0, None as max to mean infinity
-# NOTE: This is a fallback list. The main list is loaded from data/compromised-packages.txt
-COMPROMISED_PACKAGES = {
-    # Historical compromises with known bad versions (fallback)
-    "coa": [("2.0.3", "2.0.4"), ("2.1.1", "2.1.3"), ("3.0.1", "3.1.3")],
-    "rc": [("1.2.9", "1.2.9"), ("1.3.9", "1.3.9"), ("2.3.9", "2.3.9")],
-    "ua-parser-js": [("0.7.29", "0.7.29"), ("0.8.0", "0.8.0"), ("1.0.0", "1.0.0")],
-    "event-stream": [("3.3.6", "3.3.6")],  # Contained flatmap-stream
-    "flatmap-stream": [("0.1.0", "0.1.1")],  # Malicious package
-    "colors": [("1.4.1", "1.4.44-liberty-2")],  # Protestware versions
-    "faker": [("6.6.6", None)],  # Protestware versions 6.6.6+
-    "node-ipc": [("10.1.1", "10.1.3"), ("11.0.0", "11.1.0")],  # Peacenotwar malware
-    "peacenotwar": None,  # Entirely malicious
-}
-
-# Exact compromised package:version pairs loaded from external file
-# This is populated by load_compromised_packages_file()
-COMPROMISED_PACKAGES_EXACT: set = set()
-
-# Suspicious npm namespaces known to be targeted by supply chain attacks
-SUSPICIOUS_NAMESPACES = {
-    "@ctrl",
-    "@crowdstrike",
-    "@art-ws",
-    "@postman",
-    "@asyncapi",
-    "@zapier",
-    "@ensdomains",
-    "@posthog",
-    "@lottiefiles",
-    "@rspack",
-    "@solana",
-    # Additional targeted namespaces from Cobenian analysis
-    "@nativescript-community",
-    "@ahmedhfarag",
-    "@operato",
-    "@teselagen",
-    "@things-factory",
-    "@hestjs",
-    "@nstudio",
-    "@voiceflow",
-    "@oku-ui",
-    "@browserbasehq",
-    "@ntnx",
-    "@pergel",
-    "@silgi",
-    "@mcp-use",
-}
 
 LOCKFILE_NAMES = {
     "package-lock.json",
@@ -265,34 +213,6 @@ LOCKFILE_NAMES = {
     "yarn.lock",
 }
 
-
-def load_compromised_packages_file():
-    """Load compromised packages from external file (package:version format)."""
-    global COMPROMISED_PACKAGES_EXACT
-    
-    # Try to find compromised-packages.txt in data directory
-    script_dir = Path(__file__).parent
-    pkg_file = script_dir / "data" / "compromised-packages.txt"
-    
-    if not pkg_file.exists():
-        return 0
-    
-    count = 0
-    try:
-        with pkg_file.open("r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                # Skip comments and empty lines
-                if not line or line.startswith("#"):
-                    continue
-                # Format: package_name:version
-                if ":" in line:
-                    COMPROMISED_PACKAGES_EXACT.add(line)
-                    count += 1
-    except OSError:
-        pass
-    
-    return count
 
 # Global progress bar instance
 _progress_bar = None
@@ -1804,10 +1724,11 @@ def main():
         print(f"[!] Root path does not exist: {root}", file=sys.stderr)
         sys.exit(1)
 
-    # Load compromised packages from external file
-    pkg_count = load_compromised_packages_file()
-    if not args.json and pkg_count > 0:
-        print(f"[*] Loaded {pkg_count} compromised package versions from database\n")
+    # Load all IOC data from data/ directory
+    ioc_count = load_all_ioc_data()
+    if not args.json and not args.sarif and not args.quiet:
+        print(f"[*] Loaded {ioc_count} IOC entries from data/ directory")
+        print(f"    ({len(COMPROMISED_PACKAGES_EXACT)} compromised packages, {len(MALICIOUS_HASHES)} malicious hashes)\n")
 
     global _progress_bar
     

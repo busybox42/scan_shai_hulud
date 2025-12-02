@@ -1,0 +1,21 @@
+# Suspicious GitHub Workflow Paths
+# Direct path matches for known malicious workflows
+
+.github/workflows/discussion.yaml
+.github/workflows/discussion.yml
+.github/workflows/formatter_123456789.yml
+.github/workflows/shai-hulud-workflow.yml
+.github/workflows/shai-hulud-workflow.yaml
+.github/workflows/shai-hulud.yml
+.github/workflows/shai-hulud.yaml
+
+# Additional suspicious workflow names
+.github/workflows/sync.yml
+.github/workflows/sync.yaml
+.github/workflows/update.yml
+.github/workflows/update.yaml
+.github/workflows/ci-helper.yml
+.github/workflows/ci-helper.yaml
+.github/workflows/auto-publish.yml
+.github/workflows/auto-publish.yaml
+

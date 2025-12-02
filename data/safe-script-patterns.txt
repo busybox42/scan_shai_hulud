@@ -1,0 +1,16 @@
+# Safe Script Patterns (regex)
+# Whitelist patterns for legitimate install scripts
+
+^tsc\b
+^node-gyp\b
+^prebuild-install\b
+^opencollective-postinstall\b
+^electron-builder\s+install-app-deps\b
+^lerna\s+bootstrap\b
+^(?:nx|turbo)\s+run\b
+^esbuild\b
+^husky\b
+^patch-package\b
+^ngcc\b
+^node\s+scripts/
+

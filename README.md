@@ -15,7 +15,7 @@ Shai-Hulud is a sophisticated npm supply chain attack that has compromised hundr
 ## Features
 
 - **21 detection vectors** covering files, packages, code patterns, and configurations
-- **1,677+ compromised packages** database from multiple security advisories
+- **2,300+ compromised packages** database from multiple security advisories
 - **Known malicious file hashes** - SHA256 verification against 7 known malicious bundles
 - **Cryptocurrency theft detection** - wallet addresses, malicious functions from chalk/debug attack
 - **Exfiltration endpoint detection** - webhook.site, Discord webhooks, Telegram, etc.
@@ -292,6 +292,34 @@ If the scanner finds **High/Critical** severity issues:
 
 MIT
 
+## Project Structure
+
+```
+scan_shai_hulud/
+├── scan_shai_hulud.py   # Main scanner script
+├── update_iocs.py       # IOC database updater
+├── data/                # IOC data files (loaded at runtime)
+│   ├── compromised-packages.txt      # Exact package:version pairs (2300+)
+│   ├── compromised-packages-ranges.txt  # Version ranges for historical attacks
+│   ├── malicious-hashes.txt          # SHA256/SHA1 of known malicious files
+│   ├── ioc-filenames.txt             # Suspicious artifact filenames
+│   ├── ioc-workflows.txt             # Known malicious workflow paths
+│   ├── ioc-workflow-patterns.txt     # Workflow name patterns (regex)
+│   ├── ioc-strings.txt               # Campaign marker strings
+│   ├── ioc-domains.txt               # Malicious domains
+│   ├── exfil-endpoints.txt           # Exfiltration endpoints
+│   ├── attacker-wallets.txt          # Crypto wallet addresses
+│   ├── crypto-theft-functions.txt    # Malicious function names
+│   ├── suspicious-script-patterns.txt    # Install script patterns (regex)
+│   ├── safe-script-patterns.txt      # Whitelist patterns (regex)
+│   ├── destructive-patterns.txt      # Destructive payload patterns (regex)
+│   ├── runner-backdoor-patterns.txt  # Self-hosted runner backdoors
+│   └── suspicious-namespaces.txt     # Targeted npm namespaces
+└── README.md
+```
+
+All IOC data is stored in plain text files in `data/` for easy editing and updates.
+
 ## Contributing
 
 PRs welcome! If you discover new IOCs or compromised packages, please open an issue or PR.
@@ -305,16 +333,22 @@ PRs welcome! If you discover new IOCs or compromised packages, please open an is
 another-package:4.5.6
 ```
 
-**To add new detection patterns**, edit the relevant constants in `scan_shai_hulud.py`:
+**To add new detection patterns**, edit the relevant file in `data/`:
 
-```python
-# Known malicious file hashes
-MALICIOUS_HASHES = {"sha256hash..."}
+| What to add | File |
+|-------------|------|
+| Compromised packages | `data/compromised-packages.txt` |
+| Malicious file hashes | `data/malicious-hashes.txt` |
+| Exfiltration endpoints | `data/exfil-endpoints.txt` |
+| Malicious domains | `data/ioc-domains.txt` |
+| Crypto wallets | `data/attacker-wallets.txt` |
+| Suspicious scripts (regex) | `data/suspicious-script-patterns.txt` |
+| Known malicious workflows | `data/ioc-workflows.txt` |
+| Targeted namespaces | `data/suspicious-namespaces.txt` |
 
-# Exfiltration endpoints
-IOC_EXFIL_ENDPOINTS = {"webhook.site", ...}
-
-# Attacker wallet addresses
-ATTACKER_WALLETS = {"0x...", ...}
-```
+**File formats:**
+- Simple lists: one entry per line, `#` for comments
+- Regex patterns: one pattern per line
+- Hashes: `algorithm:hash:description` (e.g., `sha256:abc123:bundle.js`)
+- Version ranges: `package:min:max` (use `*` for any)
 

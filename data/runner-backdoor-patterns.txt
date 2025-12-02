@@ -1,0 +1,8 @@
+# Self-Hosted Runner Backdoor Patterns
+# Patterns from Nov 2025 attack targeting self-hosted runners
+
+.dev-env/
+SHA1HULUD
+Sha1Hulud
+sha1hulud
+

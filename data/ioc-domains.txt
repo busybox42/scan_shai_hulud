@@ -1,0 +1,13 @@
+# Known Malicious Domains
+# Domains used for exfiltration or phishing in npm supply chain attacks
+
+evilpackage.com
+npm-stats.com
+npm-registry.com
+registry-npm.com
+npmpkg.com
+npmpackage.com
+pkgstats.com
+telemetry-npm.com
+npmjs.help
+
